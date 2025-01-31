@@ -1,8 +1,7 @@
 <!-- src/components/TotalValue.vue -->
 <template>
   <div class="card">
-    <h2>Total Value</h2>
-    <p>${{ totalValue }}</p>
+    <h2>Total Value</h2> <h3>${{ totalValue }}</h3>
   </div>
 </template>
 

@@ -1,8 +1,8 @@
 <!-- src/components/TypeDistribution.vue -->
 <template>
-  <div class="card">
+  <div class="vcard">
     <h2>Type Distribution</h2>
-    <canvas ref="distributionChart"></canvas>
+    <canvas className="flex justify-center items-center" ref="distributionChart"></canvas>
   </div>
 </template>
 
@@ -54,7 +54,7 @@ export default {
 </script>
 
 <style scoped>
-.card {
+.vcard {
   background-color: var(--color-panel);
   border-radius: 12px;
   padding: 16px;

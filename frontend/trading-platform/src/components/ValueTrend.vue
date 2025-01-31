@@ -1,8 +1,8 @@
 <!-- src/components/ValueTrend.vue -->
 <template>
-  <div class="card">
+  <div class="vcard">
     <h2>Total Value Trend</h2>
-    <canvas ref="trendChart"></canvas>
+    <canvas className="flex justify-center items-center" ref="trendChart"></canvas>
   </div>
 </template>
 
@@ -65,10 +65,11 @@ export default {
 </script>
 
 <style scoped>
-.card {
+.vcard {
   background-color: var(--color-panel);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  
 }
 </style>
