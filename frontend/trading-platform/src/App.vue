@@ -5,6 +5,7 @@
       <div class="nav-container">
         <router-link to="/" class="nav-link">Transactions</router-link>
         <router-link to="/assets" class="nav-link">User Assets</router-link>
+        <router-link to="/all-assets">All Assets</router-link>
       </div>
     </nav>
     <main class="content">

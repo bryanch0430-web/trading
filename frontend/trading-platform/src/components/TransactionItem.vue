@@ -1,9 +1,12 @@
-<!-- src/components/TransactionItem.vue -->
 <template>
   <div class="transaction-item">
     <div class="transaction-content">
       <div>
-        <strong>{{ transaction.assetName }}</strong> ({{ transaction.type }})
+      <strong :class="typeClass">{{ transaction.type }}</strong>
+    </div>
+
+      <div>
+        <strong>{{ transaction.assetName }}</strong> 
       </div>
       <div>{{ transaction.amount }}</div>
       <div>{{ formattedTime }}</div>
@@ -25,11 +28,22 @@ export default {
       const date = new Date(this.transaction.time);
       return date.toLocaleString();
     },
+    typeClass() {
+      return this.transaction.type === 'Buy' ? 'text-blue' : 'text-red';
+    },
   },
 };
 </script>
 
 <style scoped>
+
+.text-blue {
+  color: #addfff;
+}
+
+.text-red {
+  color: #ff7f7f;
+}
 .transaction-item {
   background-color: var(--color-panel);
   border-radius: 12px; /* Rounded square */

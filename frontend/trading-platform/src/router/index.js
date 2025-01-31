@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import TransactionPage from '../views/TransactionPage.vue';
 import UserAssetPage from '../views/UserAssetPage.vue';
 import AssetDisplayPage from '../views/AssetDisplayPage.vue';
+import AllAssetsPage from '../views/AllAssetsPage.vue'; 
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     name: 'AssetDisplay',
     component: AssetDisplayPage,
     props: true,
+  },
+  {
+    path: '/all-assets', // Define the new route path
+    name: 'AllAssets',
+    component: AllAssetsPage,
   },
 ];
 
