@@ -22,5 +22,4 @@ class AssetService:
     def get_asset_by_id(self, asset_id: int):
         return self.db.query(Asset).filter(Asset.id == asset_id).first()
 
-    def get_all_assets_for_user(self, user_id: int):
-        return self.db.query(Asset).filter(Asset.user_id == user_id).all()
+
