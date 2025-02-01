@@ -59,3 +59,8 @@ class UserValueHistoryResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class MonthlyValueTrendResponse(BaseModel):
+    time: str  # Format: 'YYYY-MM'
+    value: float

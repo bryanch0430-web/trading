@@ -43,13 +43,11 @@ def get_assets(user_id: uuid.UUID, db: Session = Depends(get_db)):
 @router.get("/{user_id}/value-history", response_model=List[UserValueHistoryResponse])
 def get_value_history(
     user_id: uuid.UUID, 
-    month: Optional[int] = None, 
-    year: Optional[int] = None, 
     db: Session = Depends(get_db)
 ):
     service = UserService(db)
     try:
-        history = service.get_user_value_history(user_id, month, year)
+        history = service.get_user_value_history(user_id)
         return history
     except HTTPException as e:
         raise e

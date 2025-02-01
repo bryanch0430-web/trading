@@ -1,12 +1,14 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from schemas.user import UserCreate, UserAuth, UserAssetResponse, UserTransactionResponse, UserValueHistoryResponse
+from schemas.user import UserCreate, UserAuth, UserAssetResponse, UserTransactionResponse, UserValueHistoryResponse, MonthlyValueTrendResponse
 from model import User, Asset, UserAsset, Transaction, ValueHistory
 from utils.security import hash_password, verify_password
 from typing import List, Optional
 from datetime import datetime
 import uuid
 from fastapi import HTTPException, status
+from sqlalchemy import func
+from datetime import datetime
 
 class UserService:
     def __init__(self, db: Session):
@@ -74,33 +76,32 @@ class UserService:
 
     def get_user_value_history(
         self, 
-        user_id: uuid.UUID, 
-        month: Optional[int] = None, 
-        year: Optional[int] = None
-    ) -> List[UserValueHistoryResponse]:
-        query = self.db.query(ValueHistory).filter(ValueHistory.user_id == user_id)
-        if year:
-            query = query.filter(
-                ValueHistory.timestamp.between(
-                    datetime(year, 1, 1), 
-                    datetime(year, 12, 31, 23, 59, 59)
-                )
+        user_id: uuid.UUID
+    ) -> List[MonthlyValueTrendResponse]:
+        # Aggregate total_value by month
+        query = self.db.query(
+            func.date_trunc('month', ValueHistory.timestamp).label('month'),
+            func.avg(ValueHistory.total_value).label('average_value')  # Or use func.max for latest value
+        ).filter(
+            ValueHistory.user_id == user_id
+        ).group_by(
+            'month'
+        ).order_by(
+            'month'
+        )
+        
+        results = query.all()
+        
+        # Format the results for the frontend
+        trend_data = [
+            MonthlyValueTrendResponse(
+                time=record.month.strftime("%Y-%m"),
+                value=round(record.average_value, 2)  # Rounded for better readability
             )
-        if month:
-            # Ensure year is also provided when filtering by month
-            if not year:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Year must be specified when filtering by month."
-                )
-            query = query.filter(
-                ValueHistory.timestamp.between(
-                    datetime(year, month, 1),
-                    datetime(year, month, 28, 23, 59, 59)  # Simplistic end of month
-                )
-            )
-        history = query.order_by(ValueHistory.timestamp.asc()).all()
-        return history
+            for record in results
+        ]
+        
+        return trend_data
 
     def get_all_users_assets_detailed(self) -> List[UserAssetResponse]:
         user_assets = (
