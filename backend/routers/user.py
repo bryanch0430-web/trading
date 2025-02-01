@@ -32,7 +32,7 @@ def login_user(auth_data: UserAuth, db: Session = Depends(get_db)):
     return {"message": "Authentication successful.", "user_id": user.id}
 
 
-@router.get("/users/{user_id}/assets", response_model=List[UserAssetResponse])
+@router.get("/{user_id}/assets", response_model=List[UserAssetResponse])
 def get_assets(user_id: uuid.UUID, db: Session = Depends(get_db)):
     service = UserService(db)
     assets = service.get_user_assets(user_id)
@@ -40,7 +40,7 @@ def get_assets(user_id: uuid.UUID, db: Session = Depends(get_db)):
 
 
 
-@router.get("/users/{user_id}/value-history", response_model=List[UserValueHistoryResponse])
+@router.get("/{user_id}/value-history", response_model=List[UserValueHistoryResponse])
 def get_value_history(
     user_id: uuid.UUID, 
     month: Optional[int] = None, 
