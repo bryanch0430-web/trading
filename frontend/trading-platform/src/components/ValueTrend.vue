@@ -1,8 +1,9 @@
-<!-- src/components/ValueTrend.vue -->
 <template>
   <div class="vcard">
-    <h2>Total Value Trend</h2>
-    <canvas className="flex justify-center items-center" ref="trendChart"></canvas>
+    <h2 class="text-center">Total Value Trend</h2>
+    <div class="chart-container">
+      <canvas class="canvas-size" ref="trendChart"></canvas>
+    </div>
   </div>
 </template>
 
@@ -40,17 +41,19 @@ export default {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false, // Ensures the chart adapts to the container
           scales: {
             x: {
-              display: false,
+              display: true, // Show x-axis for context
             },
             y: {
-              display: false,
+              display: true, // Show y-axis for context
             },
           },
           plugins: {
             legend: {
-              display: false,
+              display: true,
+              position: 'top', // Position the legend
             },
           },
         },
@@ -70,6 +73,18 @@ export default {
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
-  
+  text-align: center;
+  overflow: hidden; /* Ensures content stays inside */
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Adjust height for a responsive chart */
+}
+
+.canvas-size {
+  width: 100%; /* Full width of the container */
+  height: 100%; /* Full height of the container */
 }
 </style>

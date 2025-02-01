@@ -80,13 +80,17 @@ h1 {
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 24px;
+  justify-content: center; /* Center the charts horizontally */
 }
 
 /* Style for individual chart components */
 .charts-container > * {
-  flex: 1 1; /* Two columns on wider screens */
-  max-height: 1000px; /* Limit height for better layout */
-  min-width: 700px; /* Ensure charts are readable on smaller screens */
+  flex: 1 1 300px; /* Allow charts to shrink for smaller screens */
+  max-height: 400px; /* Limit height for better layout */
+  min-width: 300px; /* Ensure charts fit neatly on small screens */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .assets-list {

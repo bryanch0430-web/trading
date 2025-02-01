@@ -1,8 +1,9 @@
-<!-- src/components/TypeDistribution.vue -->
 <template>
   <div class="vcard">
-    <h2>Type Distribution</h2>
-    <canvas className="flex justify-center items-center" ref="distributionChart"></canvas>
+    <h2 class="text-center">Type Distribution</h2>
+    <div class="chart-container">
+      <canvas class="canvas-size" ref="distributionChart"></canvas>
+    </div>
   </div>
 </template>
 
@@ -37,6 +38,7 @@ export default {
         },
         options: {
           responsive: true,
+          maintainAspectRatio: true, // Prevent chart distortion
           plugins: {
             legend: {
               position: 'bottom',
@@ -59,5 +61,21 @@ export default {
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  text-align: center;
+  overflow: hidden; /* Ensure content stays inside */
+}
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.canvas-size {
+  width: 200px; /* Adjust the width */
+  height: 200px; /* Adjust the height */
+  max-width: 100%; /* Ensure responsiveness */
 }
 </style>
