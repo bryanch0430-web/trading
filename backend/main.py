@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-from .routers.user import router as user_router
+from routers.user import router as user_router
 #, asset_router, transaction_router
-from .database import Base, engine, SessionLocal
-from .scheduler import start_scheduler  
+from database import Base, engine, SessionLocal
+from scheduler import start_scheduler  
 from fastapi.middleware.cors import CORSMiddleware  
 import uvicorn
 
@@ -27,12 +27,7 @@ app.include_router(user_router, prefix="/users", tags=["Users"])
 # app.include_router(asset_router.router, prefix="/assets", tags=["Assets"])
 # app.include_router(transaction_router.router, prefix="/transactions", tags=["Transactions"])
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 @app.get("/")
 def read_root():

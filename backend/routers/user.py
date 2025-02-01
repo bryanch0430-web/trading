@@ -1,14 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from ..schemas.user import UserCreate, UserAuth, UserAssetResponse, UserTransactionResponse, UserValueHistoryResponse,UserRead
-from ..model import User, Asset, UserAsset, Transaction, ValueHistory
-from ..services.user import UserService
-from ..utils.security import hash_password, verify_password
+from schemas.user import UserCreate, UserAuth, UserAssetResponse, UserTransactionResponse, UserValueHistoryResponse,UserRead
+from services.user import UserService
+from utils.security import hash_password, verify_password
 from typing import List, Optional
 from datetime import datetime
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
-from ..main import get_db
+from database import get_db
 router = APIRouter()
 
 @router.post("/register", response_model=UserRead)

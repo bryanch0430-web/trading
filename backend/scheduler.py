@@ -1,8 +1,8 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from sqlalchemy.orm import Session
-from .database import SessionLocal
-from .model import ValueHistory, User, UserAsset
+from database import SessionLocal
+from model import ValueHistory, User, UserAsset
 from datetime import datetime
 from pytz import timezone
 from sqlalchemy import func
