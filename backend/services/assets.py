@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from schemas import assets
+from schemas.assets import AssetDetails,AssetCreate,UserAssetDisplayResponse, ListUserAssetDisplayResponse
 from model import Asset, UserAsset
-from typing import Optional
+from typing import List, Optional
 import pandas as pd
 import yfinance as yf
 import logging
 import time
-
+import uuid
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -15,10 +15,35 @@ class AssetService:
     def __init__(self, db: Session):
             self.db = db
 
-    def create_asset(self, asset: assets.AssetCreate):
+    def create_asset(self, asset: AssetCreate):
+
+        try:
+
+            stock = yf.Ticker(asset.label)  
+            info = stock.info
+
+        except Exception as e:
+            raise ValueError(f"Could not retrieve data from yfinance for {asset.label}. Error: {e}")
+        
+
+        existing_asset = self.get_asset_by_label(asset.label)
+        if existing_asset:
+            raise ValueError(f"asset alraeady exit")
+        if '-USD' in asset.label:  
+            asset_type = 'crypto'
+        elif info.get('quoteType') == 'EQUITY':  
+            asset_type = 'stock'
+        elif info.get('quoteType') == 'ETF': 
+            asset_type = 'etf'
+        elif info.get('quoteType') == 'MUTUALFUND':  
+            asset_type = 'mutual_fund'
+        else:
+            asset_type = 'other' 
+
+        name = info.get('shortName') or info.get('longName') or asset.label
         db_asset = Asset(
-            name=asset.name,
-            asset_type=asset.asset_type,
+            name=name,
+            asset_type=asset_type,
             label =asset.label
         )
         self.db.add(db_asset)
@@ -28,16 +53,68 @@ class AssetService:
 
     def get_asset_by_id(self, asset_id: int):
         return self.db.query(Asset).filter(Asset.id == asset_id).first()
+    def get_asset_price(self, asset_id: int) -> AssetDetails:
+        asset = self.db.query(Asset).filter(Asset.id == asset_id).first()
+        if not asset:
+            raise ValueError("Asset not found.")
+        try:
+            stock = yf.Ticker(asset.label) 
+            data = stock.history()
+            info = stock.info
+            print(data)
+        
+        except Exception as e:
+            raise ValueError(f"Could not retrieve data from yfinance for {asset.name}. Error: {e}")
+        
+        asset_details = AssetDetails(
+            asset_id=asset_id,
+            name=asset.label,
+            current_price=data['Close'].iloc[-1],
+            previous_close=info.get("previousClose"),
+            open_price=info.get("open"),
+            day_high=info.get("dayHigh"),
+            day_low=info.get("dayLow"),
+            market_cap=info.get("marketCap"),
+            volume=info.get("volume"),
+            currency=info.get("currency"),
+            sector=info.get("sector"),
+            industry=info.get("industry"),
+        )
 
+        return asset_details
 
     def get_asset_by_name(self, name: str) -> Optional[Asset]:
         return self.db.query(Asset).filter(Asset.name == name).first()
     def get_asset_by_label(self, label: str) -> Optional[Asset]:
         return self.db.query(Asset).filter(Asset.label == label).first()
-    def get_user_asset(self, user_id: str, asset_id: str) -> Optional[UserAsset]:
-        return self.db.query(UserAsset).filter(UserAsset.user_id == user_id, UserAsset.asset_id == asset_id).first()
+    def get_user_asset(self, user_id: uuid.UUID) -> Optional[List[UserAssetDisplayResponse]]:
+        query = (
+            self.db.query(UserAsset, Asset)
+            .join(Asset, UserAsset.asset_id == Asset.id)
+            .filter(UserAsset.user_id == user_id)
+            .all()
+        )
+
+        if not query:
+            return None
+
+        assets = [
+            UserAssetDisplayResponse(
+                asset_id=ua.asset_id,
+                name=asset.name,
+                amount=ua.total_value,
+                average_price=ua.average_price,
+            )
+            for ua, asset in query
+        ]
+        return ListUserAssetDisplayResponse(response=assets)
+    
+    
     def list_all_asset(self)-> Optional[Asset]:
          return self.db.query(Asset).all()
+    
+
+    # for data injectionnnnnnnnnnnnnnnnnn
     def import_assets_from_csv(self):
         try:
             # Read the CSV file
@@ -83,7 +160,7 @@ class AssetService:
                     name = info.get('shortName') or info.get('longName') or symbol
 
                     # Prepare AssetCreate schema
-                    asset_data = assets.AssetCreate(
+                    asset_data = AssetCreate(
                         name=name,
                         asset_type=asset_type,
                         label=symbol
