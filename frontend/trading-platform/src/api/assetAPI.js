@@ -11,7 +11,7 @@ async function ListAsset() {
       const response = await axios.get(requestUrl);
   
   
-      return response
+      return response.data
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error; 
