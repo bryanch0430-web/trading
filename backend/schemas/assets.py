@@ -4,13 +4,14 @@ from datetime import datetime
 
 class AssetBase(BaseModel):
     name: str
+    label: str
     asset_type: str
-    total_value: float
 
+    
 class AssetCreate(BaseModel):
     name: str
+    label: str
     asset_type: str
-    total_value: float
 
 
 class AssetOut(AssetBase):

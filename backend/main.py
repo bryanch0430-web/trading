@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from routers.user import router as user_router
+from routers.assets import router as asset_router
+
 #, asset_router, transaction_router
 from database import Base, engine, SessionLocal
 from scheduler import start_scheduler  
@@ -24,7 +26,7 @@ app.add_middleware(
 
 
 app.include_router(user_router, prefix="/users", tags=["Users"])
-# app.include_router(asset_router.router, prefix="/assets", tags=["Assets"])
+app.include_router(asset_router, prefix="/assets", tags=["Assets"])
 # app.include_router(transaction_router.router, prefix="/transactions", tags=["Transactions"])
 
 

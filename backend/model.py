@@ -22,6 +22,7 @@ class Asset(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String, index=True, nullable=False)
+    label = Column(String, index=True, nullable=False)
     asset_type = Column(String, nullable=False)  # e.g., "crypto", "stock", ...
 
     user_assets = relationship("UserAsset", back_populates="asset")
