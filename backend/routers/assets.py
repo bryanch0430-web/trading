@@ -8,6 +8,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from database import get_db
 from services.assets import AssetService
+from model import Asset
 router = APIRouter()
 
 @router.post("/fetchStock")
@@ -18,3 +19,4 @@ def fetch_stock(db: Session = Depends(get_db)):
         return a
     except HTTPException as e:
         raise e
+# @router.get("/list_all_asset",response_model=[Asset])

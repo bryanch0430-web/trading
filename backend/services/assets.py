@@ -36,7 +36,8 @@ class AssetService:
         return self.db.query(Asset).filter(Asset.label == label).first()
     def get_user_asset(self, user_id: str, asset_id: str) -> Optional[UserAsset]:
         return self.db.query(UserAsset).filter(UserAsset.user_id == user_id, UserAsset.asset_id == asset_id).first()
-
+    def list_all_asset(self)-> Optional[Asset]:
+         return self.db.query(Asset).all()
     def import_assets_from_csv(self):
         try:
             # Read the CSV file
