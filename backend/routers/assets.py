@@ -66,3 +66,21 @@ def fetch_user_asset(user_id: uuid.UUID, db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred.",
         )
+    
+
+@router.get("/list_all_asset")
+def list_all_asset( db: Session = Depends(get_db)):
+    service = AssetService(db)
+
+    try:
+        assets = service.list_all_asset()
+
+        return assets
+    
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred.",
+        )

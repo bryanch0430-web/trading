@@ -2,13 +2,13 @@
   <div class="transaction-item">
     <div class="transaction-content">
       <div>
-      <strong :class="typeClass">{{ transaction.transaction_type }}</strong>
-    </div>
-
+        <strong :class="typeClass">{{ transaction.transaction_type }}</strong>
+      </div>
       <div>
-        <strong>{{ transaction.assetName }}</strong> 
+        <strong>{{ transaction.asset_name }}</strong> 
       </div>
       <div>{{ transaction.amount }}</div>
+      <div>{{ transaction.price }}</div>
       <div>{{ formattedTime }}</div>
     </div>
   </div>
@@ -25,24 +25,28 @@ export default {
   },
   computed: {
     formattedTime() {
-      const date = new Date(this.transaction.time);
-      return date.toLocaleString();
+      const date = new Date(this.transaction.timestamp); // Updated here
+      return isNaN(date) ? 'Invalid Date' : date.toLocaleString();
     },
     typeClass() {
-      if (this.transaction.transaction_type === 'buy') {
-        return 'text-blue';
-      } else if (this.transaction.transaction_type === 'sell') {
-        return 'text-red';
-      } else if (this.transaction.transaction_type === 'withdraw') {
-        return 'text-yellow';
-      } else if (this.transaction.transaction_type === 'deposit') {
-        return 'text-green';
+      const type = this.transaction.transaction_type;
+      switch(type) {
+        case 'buy':
+          return 'text-blue';
+        case 'sell':
+          return 'text-red';
+        case 'withdraw':
+          return 'text-yellow';
+        case 'deposit':
+          return 'text-green';
+        default:
+          return '';
       }
-      return '';
     },
   },
 };
 </script>
+
 
 <style scoped>
 

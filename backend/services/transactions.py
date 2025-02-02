@@ -26,13 +26,25 @@ class TransactionService:
         user_id: uuid.UUID, 
         skip: int = 0, 
         limit: int = 100
-    ) -> List[TransactionResponse]:
+    ) -> List["TransactionResponse"]:
+        # Verify if the user exists
         user = self.db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
+        # Perform a join between Transaction and Asset to get asset_name
         transactions = (
-            self.db.query(Transaction)
+            self.db.query(
+                Transaction.id,
+                Transaction.user_id,
+                Transaction.asset_id,
+                Asset.name.label("asset_name"),
+                Transaction.transaction_type,
+                Transaction.amount,
+                Transaction.price,
+                Transaction.timestamp
+            )
+            .join(Asset, Transaction.asset_id == Asset.id)
             .filter(Transaction.user_id == user_id)
             .order_by(desc(Transaction.timestamp))
             .offset(skip)
@@ -40,7 +52,22 @@ class TransactionService:
             .all()
         )
 
-        return transactions
+        # Map the results to the TransactionResponse Pydantic model
+        transaction_responses = [
+            TransactionResponse(
+                id=tx.id,
+                user_id=tx.user_id,
+                asset_id=tx.asset_id,
+                asset_name=tx.asset_name,
+                transaction_type=tx.transaction_type,
+                amount=tx.amount,
+                price=tx.price,
+                timestamp=tx.timestamp,
+            )
+            for tx in transactions
+        ]
+
+        return transaction_responses
     def deposit(self, transaction_data: DepositTransactionCreate):
         user_id = transaction_data.user_id
         asset_id = transaction_data.asset_id

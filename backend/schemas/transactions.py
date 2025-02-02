@@ -51,6 +51,7 @@ class TransactionResponse(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
     asset_id: Optional[uuid.UUID]
+    asset_name:str
     transaction_type: TransactionType
     amount: float
     price: float
