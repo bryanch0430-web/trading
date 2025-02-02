@@ -7,3 +7,5 @@ pytz
 uvicorn
 pydantic[email]
 psycopg2
+pandas
+yfinacne
