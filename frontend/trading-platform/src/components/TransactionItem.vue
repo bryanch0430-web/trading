@@ -2,7 +2,7 @@
   <div class="transaction-item">
     <div class="transaction-content">
       <div>
-      <strong :class="typeClass">{{ transaction.type }}</strong>
+      <strong :class="typeClass">{{ transaction.transaction_type }}</strong>
     </div>
 
       <div>
@@ -29,7 +29,16 @@ export default {
       return date.toLocaleString();
     },
     typeClass() {
-      return this.transaction.type === 'Buy' ? 'text-blue' : 'text-red';
+      if (this.transaction.transaction_type === 'buy') {
+        return 'text-blue';
+      } else if (this.transaction.transaction_type === 'sell') {
+        return 'text-red';
+      } else if (this.transaction.transaction_type === 'withdraw') {
+        return 'text-yellow';
+      } else if (this.transaction.transaction_type === 'deposit') {
+        return 'text-green';
+      }
+      return '';
     },
   },
 };
@@ -43,6 +52,13 @@ export default {
 
 .text-red {
   color: #ff7f7f;
+}
+.text-yellow {
+  color: #ffd700; /* Yellow */
+}
+
+.text-green {
+  color: #32cd32; /* Lime green */
 }
 .transaction-item {
   background-color: var(--color-panel);

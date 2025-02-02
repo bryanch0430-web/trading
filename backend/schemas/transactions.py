@@ -53,6 +53,7 @@ class TransactionResponse(BaseModel):
     asset_id: Optional[uuid.UUID]
     transaction_type: TransactionType
     amount: float
+    price: float
     timestamp: datetime
 
     class Config:
