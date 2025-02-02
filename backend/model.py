@@ -48,6 +48,7 @@ class Transaction(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
     transaction_type = Column(String, nullable=False)  # deposit, withdraw, buy, sell
     amount = Column(Float, nullable=False)
+    price = Column(Float, nullable=True)
     timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     user = relationship("User", back_populates="transactions")

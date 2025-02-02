@@ -57,3 +57,15 @@ class TransactionResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserTransactionResponse(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    asset_id: Optional[uuid.UUID]
+    transaction_type: TransactionType
+    amount: float
+    timestamp: datetime
+
+    class Config:
+        orm_mode = True

@@ -5,12 +5,15 @@ from schemas.transactions import (
     SellTransactionCreate,
     DepositTransactionCreate,
     WithdrawTransactionCreate,
+    TransactionResponse
 )
 from model import User, Asset, UserAsset, Transaction
 from datetime import datetime
 import uuid
 from fastapi import HTTPException, status
 import logging
+from typing import Optional, List
+from sqlalchemy import desc
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,7 +21,26 @@ logger = logging.getLogger(__name__)
 class TransactionService:
     def __init__(self, db: Session):
         self.db = db
+    def get_all_transactions(
+        self, 
+        user_id: uuid.UUID, 
+        skip: int = 0, 
+        limit: int = 100
+    ) -> List[TransactionResponse]:
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
+        transactions = (
+            self.db.query(Transaction)
+            .filter(Transaction.user_id == user_id)
+            .order_by(desc(Transaction.timestamp))
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+        return transactions
     def deposit(self, transaction_data: DepositTransactionCreate):
         user_id = transaction_data.user_id
         asset_id = transaction_data.asset_id
@@ -36,7 +58,8 @@ class TransactionService:
             asset_id=asset_id,
             transaction_type="deposit",
             amount=amount,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.utcnow(),
+            price = transaction_data.deposit_pricing
         )
         self.db.add(transaction)
 
@@ -101,6 +124,7 @@ class TransactionService:
             transaction_type="withdraw",
             amount=amount,
             timestamp=datetime.utcnow()
+            
         )
         self.db.add(transaction)
 
@@ -177,7 +201,8 @@ class TransactionService:
             asset_id=buy_target_asset_id,  # Asset being bought
             transaction_type="buy",
             amount=amount,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.utcnow(),
+            price = current_buying_price
         )
         self.db.add(transaction)
 
@@ -263,7 +288,8 @@ class TransactionService:
             asset_id=sell_target_asset_id,  # Asset being sold
             transaction_type="sell",
             amount=amount,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.utcnow(),
+            price = current_selling_price
         )
         self.db.add(transaction)
 
@@ -274,3 +300,5 @@ class TransactionService:
         except Exception as e:
             self.db.rollback()
             raise HTTPException(status_code=400, detail="Transaction failed: " + str(e))
+        
+
