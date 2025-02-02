@@ -1,124 +1,276 @@
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
-from fastapi import HTTPException, status
-from uuid import UUID
+from sqlalchemy.exc import IntegrityError
+from schemas.transactions import (
+    BuyTransactionCreate,
+    SellTransactionCreate,
+    DepositTransactionCreate,
+    WithdrawTransactionCreate,
+)
+from model import User, Asset, UserAsset, Transaction
 from datetime import datetime
-from model import User, Asset, UserAsset, Transaction, ValueHistory
-from schemas.transactions import TransactionCreate, TransactionResponse, TransactionType
+import uuid
+from fastapi import HTTPException, status
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class TransactionService:
     def __init__(self, db: Session):
         self.db = db
 
-    def process_transaction(self, user_id: UUID, transaction_data: TransactionCreate) -> TransactionResponse:
-        try:
-            # Start a new transaction
-            with self.db.begin():
-                # Fetch the user
-                user = self.db.query(User).filter(User.id == user_id).first()
-                if not user:
-                    raise HTTPException(
-                        status_code=status.HTTP_404_NOT_FOUND,
-                        detail="User not found."
-                    )
+    def deposit(self, transaction_data: DepositTransactionCreate):
+        user_id = transaction_data.user_id
+        asset_id = transaction_data.asset_id
+        amount = transaction_data.amount
+        deposit_pricing = transaction_data.deposit_pricing
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        asset = self.db.query(Asset).filter(Asset.id == asset_id).first()
+        if not asset:
+            raise HTTPException(status_code=404, detail="Asset not found")
+        transaction = Transaction(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            asset_id=asset_id,
+            transaction_type="deposit",
+            amount=amount,
+            timestamp=datetime.utcnow()
+        )
+        self.db.add(transaction)
 
-                # Handle transactions that require an asset
-                if transaction_data.transaction_type in [
-                    TransactionType.deposit,
-                    TransactionType.withdraw,
-                    TransactionType.buy,
-                    TransactionType.sell
-                ]:
-                    if not transaction_data.asset_id:
-                        raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="asset_id is required for this transaction type."
-                        )
-                    
-                    # Fetch the asset
-                    asset = self.db.query(Asset).filter(Asset.id == transaction_data.asset_id).first()
-                    if not asset:
-                        raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Asset not found."
-                        )
-                    
-                    # Fetch or create UserAsset
-                    user_asset = self.db.query(UserAsset).filter(
-                        UserAsset.user_id == user_id,
-                        UserAsset.asset_id == transaction_data.asset_id
-                    ).first()
-                    
-                    if not user_asset:
-                        if transaction_data.transaction_type in [TransactionType.deposit, TransactionType.buy]:
-                            user_asset = UserAsset(
-                                user_id=user_id,
-                                asset_id=transaction_data.asset_id,
-                                total_value=0.0,
-                                average_price=0.0  # Assuming average_price is handled elsewhere
-                            )
-                            self.db.add(user_asset)
-                            self.db.flush()  # Assigns an ID if needed
-                        else:
-                            raise HTTPException(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="User does not own this asset."
-                            )
+        user_asset = self.db.query(UserAsset).filter(
+            UserAsset.user_id == user_id, UserAsset.asset_id == asset_id
+        ).first()
+        if user_asset:
+            if deposit_pricing:
+                previous_total_value = user_asset.total_value
+                previous_avg_price = user_asset.average_price
 
-                    # Process based on transaction type
-                    if transaction_data.transaction_type == TransactionType.deposit:
-                        user_asset.total_value += transaction_data.amount
-                    
-                    elif transaction_data.transaction_type == TransactionType.withdraw:
-                        if user_asset.total_value < transaction_data.amount:
-                            raise HTTPException(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Insufficient asset balance."
-                            )
-                        user_asset.total_value -= transaction_data.amount
-                    
-                    elif transaction_data.transaction_type == TransactionType.buy:
-                        # Here, you might want to deduct from user's USD/HKD balance
-                        # Since USD handling isn't provided, we'll focus on asset
-                        user_asset.total_value += transaction_data.amount
-                    
-                    elif transaction_data.transaction_type == TransactionType.sell:
-                        if user_asset.total_value < transaction_data.amount:
-                            raise HTTPException(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Insufficient asset balance to sell."
-                            )
-                        user_asset.total_value -= transaction_data.amount
-                        # Here, you might want to add to user's USD/HKD balance
+                new_total_value = previous_total_value + amount
 
-                # Create the Transaction record
-                transaction = Transaction(
-                    user_id=user_id,
-                    asset_id=transaction_data.asset_id,
-                    transaction_type=transaction_data.transaction_type.value,
-                    amount=transaction_data.amount,
-                    timestamp=datetime.utcnow()
-                )
-                self.db.add(transaction)
+                new_average_price = (
+                    (previous_avg_price * previous_total_value) + (deposit_pricing * amount)
+                ) / new_total_value
 
-                # Update the ValueHistory
-                total_value = 0.0
-                for ua in user.assets:
-                    total_value += ua.total_value
-                value_history = ValueHistory(
-                    user_id=user_id,
-                    total_value=total_value,
-                    timestamp=datetime.utcnow()
-                )
-                self.db.add(value_history)
-
-                # Commit happens automatically with `with self.db.begin()`
-
-                return TransactionResponse.from_orm(transaction)
-
-        except SQLAlchemyError as e:
-            self.db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="An error occurred while processing the transaction."
+                user_asset.total_value = new_total_value
+                user_asset.average_price = new_average_price
+            else:
+                user_asset.total_value += amount
+        else:
+            user_asset = UserAsset(
+                user_id=user_id,
+                asset_id=asset_id,
+                total_value=amount,
+                average_price=deposit_pricing if deposit_pricing else 0.0
             )
+            self.db.add(user_asset)
+
+        try:
+            self.db.commit()
+            self.db.refresh(transaction)
+            return transaction
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=400, detail="Transaction failed")
+
+    def withdraw(self, transaction_data: WithdrawTransactionCreate):
+        user_id = transaction_data.user_id
+        asset_id = transaction_data.asset_id
+        amount = transaction_data.amount
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        asset = self.db.query(Asset).filter(Asset.id == asset_id).first()
+        if not asset:
+            raise HTTPException(status_code=404, detail="Asset not found")
+
+        user_asset = self.db.query(UserAsset).filter(
+            UserAsset.user_id == user_id, UserAsset.asset_id == asset_id
+        ).first()
+        if not user_asset or user_asset.total_value < amount:
+            raise HTTPException(status_code=400, detail="Insufficient asset to withdraw")
+
+        user_asset.total_value -= amount
+
+        transaction = Transaction(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            asset_id=asset_id,
+            transaction_type="withdraw",
+            amount=amount,
+            timestamp=datetime.utcnow()
+        )
+        self.db.add(transaction)
+
+        try:
+            self.db.commit()
+            self.db.refresh(transaction)
+            return transaction
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=400, detail="Transaction failed")
+
+    def buy(self, transaction_data: BuyTransactionCreate):
+        user_id = transaction_data.user_id
+        buy_target_asset_id = transaction_data.buy_target_asset_id
+        use_asset_id = transaction_data.use_asset_id
+        amount = transaction_data.amount
+        current_buying_price = transaction_data.current_buying_price
+
+        # Validate user exists
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Validate target asset exists
+        target_asset = self.db.query(Asset).filter(Asset.id == buy_target_asset_id).first()
+        if not target_asset:
+            raise HTTPException(status_code=404, detail="Target asset not found")
+
+        # Validate use_asset exists (e.g., USD)
+        use_asset = self.db.query(Asset).filter(Asset.id == use_asset_id).first()
+        if not use_asset:
+            raise HTTPException(status_code=404, detail="Use asset not found")
+
+        # Check that the user has sufficient funds
+        total_cost = amount * current_buying_price
+        user_use_asset = self.db.query(UserAsset).filter(
+            UserAsset.user_id == user_id, UserAsset.asset_id == use_asset_id
+        ).first()
+        if not user_use_asset or user_use_asset.total_value < total_cost:
+            raise HTTPException(status_code=400, detail="Insufficient funds to perform this transaction")
+
+        # Deduct the total cost from user's use_asset
+        user_use_asset.total_value -= total_cost
+
+        # Update user's target asset holdings
+        user_target_asset = self.db.query(UserAsset).filter(
+            UserAsset.user_id == user_id, UserAsset.asset_id == buy_target_asset_id
+        ).first()
+        if user_target_asset:
+            previous_total_value = user_target_asset.total_value
+            previous_avg_price = user_target_asset.average_price
+
+            new_total_value = previous_total_value + amount
+            new_average_price = (
+                (previous_avg_price * previous_total_value) + (current_buying_price * amount)
+            ) / new_total_value
+
+            user_target_asset.total_value = new_total_value
+            user_target_asset.average_price = new_average_price
+        else:
+            # Create new UserAsset record
+            user_target_asset = UserAsset(
+                user_id=user_id,
+                asset_id=buy_target_asset_id,
+                total_value=amount,
+                average_price=current_buying_price,
+            )
+            self.db.add(user_target_asset)
+
+        # Create Transaction record
+        transaction = Transaction(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            asset_id=buy_target_asset_id,  # Asset being bought
+            transaction_type="buy",
+            amount=amount,
+            timestamp=datetime.utcnow()
+        )
+        self.db.add(transaction)
+
+        try:
+            self.db.commit()
+            self.db.refresh(transaction)
+            return transaction
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=400, detail="Transaction failed")
+
+    def sell(self, transaction_data: SellTransactionCreate):
+        user_id = transaction_data.user_id
+        sell_target_asset_id = transaction_data.sell_target_asset_id or uuid.UUID("d383faea-bf2a-4a07-8fb3-294bfb31daf8")
+        get_back_asset_id = transaction_data.get_back_asset_id or uuid.UUID("d383faea-bf2a-4a07-8fb3-294bfb31daf8")  # Assuming USD
+        amount = transaction_data.amount
+        current_selling_price = transaction_data.current_selling_price
+
+        # Validate user exists
+        user = self.db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Validate target asset exists
+        target_asset = self.db.query(Asset).filter(Asset.id == sell_target_asset_id).first()
+        if not target_asset:
+            raise HTTPException(status_code=404, detail="Target asset not found")
+
+        # Validate get_back_asset exists (e.g., USD)
+        get_back_asset = self.db.query(Asset).filter(Asset.id == get_back_asset_id).first()
+        if not get_back_asset:
+            raise HTTPException(status_code=404, detail="Get back asset not found")
+
+        # Check that the user has sufficient asset to sell
+        user_target_asset = self.db.query(UserAsset).filter(
+            UserAsset.user_id == user_id, UserAsset.asset_id == sell_target_asset_id
+        ).first()
+        if not user_target_asset or user_target_asset.total_value < amount:
+            raise HTTPException(status_code=400, detail="Insufficient asset to sell")
+
+        previous_total_value = user_target_asset.total_value
+        previous_average_price = user_target_asset.average_price
+        total_value_after = previous_total_value - amount
+
+        # Calculate cost basis before sale (total cost of holdings)
+        cost_basis_before = previous_total_value * previous_average_price
+
+        # Calculate proceeds from the sale
+        proceeds = amount * current_selling_price
+
+        # Adjust the cost basis after sale by removing the cost of the sold assets
+        cost_basis_sold = amount * previous_average_price
+        cost_basis_after = cost_basis_before - proceeds
+
+        # Update average_price
+        if total_value_after > 0:
+            user_target_asset.average_price = cost_basis_after / total_value_after
+        else:
+            user_target_asset.average_price = 0.0
+
+        # Update total_value
+        user_target_asset.total_value = total_value_after
+
+        # Add the proceeds to user's get_back_asset (e.g., USD)
+        user_get_back_asset = self.db.query(UserAsset).filter(
+            UserAsset.user_id == user_id, UserAsset.asset_id == get_back_asset_id
+        ).first()
+        if user_get_back_asset:
+            user_get_back_asset.total_value += proceeds
+        else:
+            user_get_back_asset = UserAsset(
+                user_id=user_id,
+                asset_id=get_back_asset_id,
+                total_value=proceeds,
+                average_price=1.0  # Assuming USD has average price of 1.0
+            )
+            self.db.add(user_get_back_asset)
+
+        # Create Transaction record
+        transaction = Transaction(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            asset_id=sell_target_asset_id,  # Asset being sold
+            transaction_type="sell",
+            amount=amount,
+            timestamp=datetime.utcnow()
+        )
+        self.db.add(transaction)
+
+        try:
+            self.db.commit()
+            self.db.refresh(transaction)
+            return transaction
+        except Exception as e:
+            self.db.rollback()
+            raise HTTPException(status_code=400, detail="Transaction failed: " + str(e))
