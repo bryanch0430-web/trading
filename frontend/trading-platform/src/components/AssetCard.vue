@@ -1,9 +1,9 @@
 <!-- src/components/AssetCard.vue -->
 <template>
   <div class="asset-card" @click="navigateToAsset">
-    <h3>{{ asset.name }}</h3>
-    <p>Amount: {{ asset.amount }}</p>
-    <p>Buy Price: ${{ asset.buyPrice }}</p>
+    <h3>{{ asset.asset_name }}</h3>
+    <p>Amount: {{ asset.total_value }}</p>
+    <p>Buy Price: ${{ asset.average_price }} </p>
   </div>
 </template>
 
@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     navigateToAsset() {
-      this.$router.push({ name: 'AssetDisplay', params: { id: this.asset.id } });
+      this.$router.push({ name: 'AssetDisplay', params: { id: this.asset.asset_id } });
     },
   },
 };

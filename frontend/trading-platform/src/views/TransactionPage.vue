@@ -1,41 +1,45 @@
 <template>
   <div class="container">
     <h1>User Transactions</h1>
-    <div v-if="transactions.length">
-      <div v-for="transaction in transactions" :key="transaction.id">
-        <TransactionItem :transaction="transaction" />
-      </div>
+
+    <!-- Show loading spinner while data is being fetched -->
+    <div v-if="loading" class="loading-spinner">
+      <p>Loading transactions...</p>
+      <!-- Add a spinner or animation here -->
     </div>
+
+    <!-- Show transactions once data is loaded -->
     <div v-else>
-      <p>No transactions found.</p>
+      <div v-if="transactions.length">
+        <div v-for="transaction in transactions" :key="transaction.id">
+          <TransactionItem :transaction="transaction" />
+        </div>
+      </div>
+      <div v-else>
+        <p>No transactions found.</p>
+      </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { onMounted, computed } from 'vue';
-import { useTransactionStore } from '../store/transactionStore'; 
+import { useTransactionStore } from '../store/transactionStore';
 import TransactionItem from '../components/TransactionItem.vue';
 
-export default {
-  components: {
-    TransactionItem,
-  },
-  setup() {
-    const transactionStore = useTransactionStore();
+// Use the Pinia store
+const transactionStore = useTransactionStore();
 
-    const transactions = computed(() => transactionStore.allTransactions);
+// Fetch transactions when the component is mounted
+onMounted(() => {
+  transactionStore.fetchUserTransactions();
+});
 
-    onMounted(() => {
-      transactionStore.fetchUserTransactions();
-    });
-
-    return {
-      transactions,
-    };
-  },
-};
+// Compute transactions and loading state from the store
+const transactions = computed(() => transactionStore.allTransactions);
+const loading = computed(() => transactionStore.loading); // Get the loading state
 </script>
+
 
 <style scoped>
 .container {

@@ -9,60 +9,57 @@
       <TypeDistribution :distributionData="distributionData" />
     </div>
 
-    <div class="assets-list">
+    <!-- Show loading spinner while data is being fetched -->
+    <div v-if="loading" class="loading-spinner">
+      <p>Loading assets...</p>
+      <!-- Add a spinner or animation here -->
+    </div>
+
+    <!-- Show assets once data is loaded -->
+    <div v-else class="assets-list">
       <AssetCard v-for="asset in assets" :key="asset.id" :asset="asset" />
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import TotalValue from '../components/TotalValue.vue';
 import ValueTrend from '../components/ValueTrend.vue';
 import TypeDistribution from '../components/TypeDistribution.vue';
 import AssetCard from '../components/AssetCard.vue';
+import { onMounted, computed } from 'vue';
+import { useUserStore } from '../store/userStore';
 
-export default {
-  name: 'UserAssetPage',
-  components: {
-    TotalValue,
-    ValueTrend,
-    TypeDistribution,
-    AssetCard,
-  },
-  data() {
-    return {
-      totalValue: 15000, // Mock total value
-      trendData: [
-        { time: 'Jan', value: 10000 },
-        { time: 'Feb', value: 11000 },
-        { time: 'Mar', value: 12000 },
-        { time: 'Apr', value: 13000 },
-        { time: 'May', value: 15000 },
-      ],
-      distributionData: {
-        Bitcoin: 40,
-        Ethereum: 30,
-        Litecoin: 20,
-        Ripple: 10,
-      },
-      assets: [
-        {
-          id: 1,
-          name: 'Bitcoin',
-          amount: 2,
-          buyPrice: 4000,
-        },
-        {
-          id: 2,
-          name: 'Ethereum',
-          amount: 5,
-          buyPrice: 2000,
-        },
-      ],
-    };
-  },
+// Mock data
+const totalValue = 15000;
+const trendData = [
+  { time: 'Jan', value: 10000 },
+  { time: 'Feb', value: 11000 },
+  { time: 'Mar', value: 12000 },
+  { time: 'Apr', value: 13000 },
+  { time: 'May', value: 15000 },
+];
+const distributionData = {
+  Bitcoin: 40,
+  Ethereum: 30,
+  Litecoin: 20,
+  Ripple: 10,
 };
+
+// Use the Pinia store
+const useStore = useUserStore();
+
+// Fetch assets when the component is mounted
+onMounted(async () => {
+  await useStore.fetchUserAssets();
+});
+
+// Compute assets and loading state from the store
+const assets = computed(() => useStore.userAsset);
+const loading = computed(() => useStore.loading); // Get the loading state
 </script>
+
+
 
 <style scoped>
 .container {
