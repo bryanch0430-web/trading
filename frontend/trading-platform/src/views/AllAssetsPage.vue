@@ -6,7 +6,7 @@
         v-for="asset in assets"
         :key="asset.id"
         class="asset-item"
-
+        @click="goToAsset(asset.id)"
       >
         <h2>{{ asset.name }}</h2>
         <p><strong>Label:</strong> {{ asset.label }}</p>
@@ -33,9 +33,9 @@ onMounted(async () => {
   await assetStore.fetchAllAssets();
 });
 
-// const goToAsset = (id) => {
-//   router.push({ name: 'AssetDisplay', params: { id } });
-// };
+  const goToAsset = (id) => {
+    router.push({ name: 'AssetDisplay', params: { id } });
+  };
 </script>
 
   <style scoped>

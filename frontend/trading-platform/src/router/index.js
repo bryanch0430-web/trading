@@ -1,4 +1,3 @@
-// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import TransactionPage from '../views/TransactionPage.vue';
 import UserAssetPage from '../views/UserAssetPage.vue';
@@ -17,10 +16,9 @@ const routes = [
     component: UserAssetPage,
   },
   {
-    path: '/asset/:id',
+    path: '/all-assets/:id',
     name: 'AssetDisplay',
     component: AssetDisplayPage,
-    props: true,
   },
   {
     path: '/all-assets', // Define the new route path

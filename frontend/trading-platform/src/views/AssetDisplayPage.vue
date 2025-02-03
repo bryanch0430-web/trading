@@ -1,19 +1,25 @@
-<!-- src/views/AssetDisplayPage.vue -->
 <template>
   <div class="container">
     <button class="button" @click="$router.back()">Back</button>
-    <h1>{{ asset.name }} Details</h1>
-    <div class="asset-details">
-      <p><strong>Current Price:</strong> ${{ asset.currentPrice.toLocaleString() }}</p>
-      <p><strong>Market Cap:</strong> ${{ asset.marketCap.toLocaleString() }}</p>
-      <p><strong>24h Volume:</strong> ${{ asset.volume24h.toLocaleString() }}</p>
-      <p><strong>Change (24h):</strong> {{ asset.change24h }}%</p>
-      <!-- Add more details as needed -->
+
+    <!-- Asset Details -->
+    <h1 v-if="asset?.name">{{ asset.name }} Details</h1>
+
+    <div v-if="loading" class="loading">Loading asset details...</div>
+    <div v-if="error" class="error">{{ error }}</div>
+
+    <div v-if="asset && !loading && !error" class="asset-details">
+      <p><strong>Current Price:</strong> ${{ asset.current_price }}</p>
+      <p><strong>Market Cap:</strong> ${{ asset.market_cap }}</p>
+      <p><strong>24h Volume:</strong> ${{ asset.volume }}</p>
+      <p v-if="asset.change24h !== undefined">
+        <strong>Change (24h):</strong> {{ asset.change24h }}%
+      </p>
     </div>
 
     <!-- Trading Section -->
     <div class="trading-section">
-      <h2>Trade {{ asset.name }}</h2>
+      <h2>Trade {{ asset?.name }}</h2>
       <div class="input-group">
         <label for="amount">Amount:</label>
         <input
@@ -39,78 +45,47 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'AssetDisplayPage',
-  props: ['id'],
-  data() {
-    return {
-      asset: {},
-      amount: 0,
-      message: '',
-      messageType: '', // 'success' or 'error'
-    };
-  },
-  computed: {
-    isValidAmount() {
-      return this.amount > 0;
-    },
-  },
-  created() {
-    // Fetch asset details based on the ID
-    // For now, use mock data
-    const mockAssets = {
-      1: {
-        name: 'Bitcoin',
-        currentPrice: 45000,
-        marketCap: 850000000000,
-        volume24h: 35000000000,
-        change24h: 2.5,
-      },
-      2: {
-        name: 'Ethereum',
-        currentPrice: 3000,
-        marketCap: 350000000000,
-        volume24h: 20000000000,
-        change24h: -1.2,
-      },
-      // Add more assets as needed
-    };
-    this.asset = mockAssets[this.id] || {};
-  },
-  methods: {
-    buyAsset() {
-      // Placeholder for buy functionality
-      // In a real application, you'd integrate with a backend or wallet service
-      if (this.isValidAmount) {
-        // Example: Calculate total cost
-        const totalCost = this.amount * this.asset.currentPrice;
-        this.message = `Successfully bought ${this.amount} ${this.asset.name} for $${totalCost.toLocaleString()}.`;
-        this.messageType = 'success';
-        this.amount = 0; // Reset amount
-      } else {
-        this.message = 'Please enter a valid amount to buy.';
-        this.messageType = 'error';
-      }
-    },
-    sellAsset() {
-      // Placeholder for sell functionality
-      // In a real application, you'd integrate with a backend or wallet service
-      if (this.isValidAmount) {
-        // Example: Calculate total revenue
-        const totalRevenue = this.amount * this.asset.currentPrice;
-        this.message = `Successfully sold ${this.amount} ${this.asset.name} for $${totalRevenue.toLocaleString()}.`;
-        this.messageType = 'success';
-        this.amount = 0; // Reset amount
-      } else {
-        this.message = 'Please enter a valid amount to sell.';
-        this.messageType = 'error';
-      }
-    },
-  },
+<script setup>
+import { onMounted, computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAssetStore } from '../store/assetStore';
+
+const assetStore = useAssetStore();
+const route = useRoute();
+const router = useRouter();
+const amount = ref(0);
+const message = ref('');
+const messageType = ref('');
+const loading = computed(() => assetStore.loading);
+const error = computed(() => assetStore.error);
+const asset = computed(() => assetStore.getcurrentAsset);
+
+const isValidAmount = computed(() => amount.value > 0);
+const assetId = route.params.id;
+
+// Lifecycle hook to fetch asset details on mount
+onMounted(async () => {
+  console.log('route.params:', route.params);
+  console.log('Fetching asset with ID:', assetId);
+  if (assetId) {
+    try {
+      await assetStore.getAssetPrice(assetId);
+    } catch (err) {
+      console.error('Failed to fetch asset:', err);
+    }
+  } else {
+    assetStore.error = 'Invalid asset ID.';
+  }
+});
+
+const buyAsset = () => {
+  // Your buy logic
+};
+
+const sellAsset = () => {
+  // Your sell logic
 };
 </script>
-
 <style scoped>
 .container {
   padding: 24px;

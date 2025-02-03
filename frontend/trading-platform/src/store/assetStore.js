@@ -1,15 +1,17 @@
 import { defineStore } from 'pinia';
-import { ListAsset } from '../api/assetAPI';
+import { ListAsset, ListAssetPrice, getUserAssets } from '../api/assetAPI';
 
 export const useAssetStore = defineStore('asset', {
     state: () => ({
       assets: null,
       loading: false,
       error: null,
+      currentAsset:null
     }),
     getters: {
       allAssets: (state) => state.assets,
       getAssetById: (state) => (id) => state.assets.find((asset) => asset.id === id),
+      getcurrentAsset: (state) => state.currentAsset, // Corrected here
     },
     actions: {
       async fetchAllAssets() {
@@ -36,6 +38,44 @@ export const useAssetStore = defineStore('asset', {
           this.loading = false;
         }
       },
+      async getAssetPrice(assetId) {
+        this.loading = true;
+        this.error = null;
+        try {
+          const data = await ListAssetPrice(assetId);
+          this.currentAsset = data;
+          
+          console.log(`Fetched price for asset ID ${assetId}:`, this.currentAsset);
+
+        } catch (error) {
+          console.error('Error in fetchAssetPrice:', error);
+          this.error = 'Failed to fetch asset price.';
+        } finally {
+          this.loading = false;
+        }
+      },
+      async fetchUserAssets(userId) {
+        this.loading = true;
+        this.error = null;
+        try {
+          const data = await getUserAssets(userId);
+          console.log(`Fetched assets for user ${userId}:`, data);
+  
+          if (Array.isArray(data)) {
+            this.assets = data;
+          } else if (typeof data === 'object') {
+            this.assets = Object.values(data);
+          } else {
+            this.assets = [data];
+          }
+        } catch (error) {
+          console.error("Error in fetchUserAssets:", error);
+          this.error = 'Failed to fetch user assets.';
+        } finally {
+          this.loading = false;
+        }
+      },
+
     },
   });
   
