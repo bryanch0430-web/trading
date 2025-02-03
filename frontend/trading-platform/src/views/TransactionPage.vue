@@ -31,8 +31,8 @@ import TransactionItem from '../components/TransactionItem.vue';
 const transactionStore = useTransactionStore();
 
 // Fetch transactions when the component is mounted
-onMounted(() => {
-  transactionStore.fetchUserTransactions();
+onMounted(async() => {
+  await transactionStore.fetchUserTransactions();
 });
 
 // Compute transactions and loading state from the store
