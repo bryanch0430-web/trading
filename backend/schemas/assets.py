@@ -12,9 +12,9 @@ class AssetCreate(BaseModel):
     label: str
 
 class UserAssetTypeDistribution(BaseModel):
-asset_type_values: Dict[str, float]
-total_value: float
-asset_type_percentages: Dict[str, float]
+    asset_type_values: Dict[str, float]
+    total_value: float
+    asset_type_percentages: Dict[str, float]
 
 class AssetOut(BaseModel):
     id: int
