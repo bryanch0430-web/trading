@@ -14,6 +14,7 @@ from fastapi import HTTPException, status
 import logging
 from typing import Optional, List
 from sqlalchemy import desc
+import yfinance as yf
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,19 +71,20 @@ class TransactionService:
         return transaction_responses
     def deposit(self, transaction_data: DepositTransactionCreate):
         user_id = transaction_data.user_id
-        asset_id = transaction_data.asset_id
+        # asset_id = transaction_data.asset_id
         amount = transaction_data.amount
+        label = 'USD=X'
         deposit_pricing = transaction_data.deposit_pricing
         user = self.db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        asset = self.db.query(Asset).filter(Asset.id == asset_id).first()
+        asset = self.db.query(Asset).filter(Asset.label == label).first()
         if not asset:
             raise HTTPException(status_code=404, detail="Asset not found")
         transaction = Transaction(
             id=uuid.uuid4(),
             user_id=user_id,
-            asset_id=asset_id,
+            asset_id=asset.id,
             transaction_type="deposit",
             amount=amount,
             timestamp=datetime.utcnow(),
@@ -91,7 +93,7 @@ class TransactionService:
         self.db.add(transaction)
 
         user_asset = self.db.query(UserAsset).filter(
-            UserAsset.user_id == user_id, UserAsset.asset_id == asset_id
+            UserAsset.user_id == user_id, UserAsset.asset_id == asset.id
         ).first()
         if user_asset:
             if deposit_pricing:
@@ -111,9 +113,9 @@ class TransactionService:
         else:
             user_asset = UserAsset(
                 user_id=user_id,
-                asset_id=asset_id,
+                asset_id=asset.id,
                 total_value=amount,
-                average_price=deposit_pricing if deposit_pricing else 0.0
+                average_price=deposit_pricing if deposit_pricing else 1.0
             )
             self.db.add(user_asset)
 
@@ -127,17 +129,19 @@ class TransactionService:
 
     def withdraw(self, transaction_data: WithdrawTransactionCreate):
         user_id = transaction_data.user_id
-        asset_id = transaction_data.asset_id
+        #asset_id = transaction_data.asset_id
         amount = transaction_data.amount
+        label = 'USD=X'
+
         user = self.db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        asset = self.db.query(Asset).filter(Asset.id == asset_id).first()
+        asset = self.db.query(Asset).filter(Asset.label == label).first()
         if not asset:
             raise HTTPException(status_code=404, detail="Asset not found")
 
         user_asset = self.db.query(UserAsset).filter(
-            UserAsset.user_id == user_id, UserAsset.asset_id == asset_id
+            UserAsset.user_id == user_id, UserAsset.asset_id == asset.id
         ).first()
         if not user_asset or user_asset.total_value < amount:
             raise HTTPException(status_code=400, detail="Insufficient asset to withdraw")
@@ -147,7 +151,7 @@ class TransactionService:
         transaction = Transaction(
             id=uuid.uuid4(),
             user_id=user_id,
-            asset_id=asset_id,
+            asset_id=asset.id,
             transaction_type="withdraw",
             amount=amount,
             timestamp=datetime.utcnow()
@@ -166,9 +170,8 @@ class TransactionService:
     def buy(self, transaction_data: BuyTransactionCreate):
         user_id = transaction_data.user_id
         buy_target_asset_id = transaction_data.buy_target_asset_id
-        use_asset_id = transaction_data.use_asset_id
         amount = transaction_data.amount
-        current_buying_price = transaction_data.current_buying_price
+        label = 'USD=X'
 
         # Validate user exists
         user = self.db.query(User).filter(User.id == user_id).first()
@@ -180,15 +183,25 @@ class TransactionService:
         if not target_asset:
             raise HTTPException(status_code=404, detail="Target asset not found")
 
+        # Fetch current buying price using yfinance
+        try:
+            stock = yf.Ticker(target_asset.label)
+            data = stock.history(period="1d")
+            if data.empty:
+                raise ValueError("No data retrieved for the asset.")
+            current_buying_price = data['Close'].iloc[-1]
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to retrieve current price: {str(e)}")
+
         # Validate use_asset exists (e.g., USD)
-        use_asset = self.db.query(Asset).filter(Asset.id == use_asset_id).first()
+        use_asset = self.db.query(Asset).filter(Asset.label == label).first()
         if not use_asset:
             raise HTTPException(status_code=404, detail="Use asset not found")
 
         # Check that the user has sufficient funds
         total_cost = amount * current_buying_price
         user_use_asset = self.db.query(UserAsset).filter(
-            UserAsset.user_id == user_id, UserAsset.asset_id == use_asset_id
+            UserAsset.user_id == user_id, UserAsset.asset_id == use_asset.id
         ).first()
         if not user_use_asset or user_use_asset.total_value < total_cost:
             raise HTTPException(status_code=400, detail="Insufficient funds to perform this transaction")
@@ -196,7 +209,7 @@ class TransactionService:
         # Deduct the total cost from user's use_asset
         user_use_asset.total_value -= total_cost
 
-        # Update user's target asset holdings
+        # Update or create user's target asset holdings
         user_target_asset = self.db.query(UserAsset).filter(
             UserAsset.user_id == user_id, UserAsset.asset_id == buy_target_asset_id
         ).first()
@@ -221,15 +234,15 @@ class TransactionService:
             )
             self.db.add(user_target_asset)
 
-        # Create Transaction record
+        # Create a Transaction record
         transaction = Transaction(
             id=uuid.uuid4(),
             user_id=user_id,
-            asset_id=buy_target_asset_id,  # Asset being bought
+            asset_id=buy_target_asset_id,
             transaction_type="buy",
             amount=amount,
             timestamp=datetime.utcnow(),
-            price = current_buying_price
+            price=current_buying_price
         )
         self.db.add(transaction)
 
@@ -239,31 +252,38 @@ class TransactionService:
             return transaction
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(status_code=400, detail="Transaction failed")
+            raise HTTPException(status_code=400, detail=f"Transaction failed: {str(e)}")
+
 
     def sell(self, transaction_data: SellTransactionCreate):
         user_id = transaction_data.user_id
-        sell_target_asset_id = transaction_data.sell_target_asset_id or uuid.UUID("d383faea-bf2a-4a07-8fb3-294bfb31daf8")
-        get_back_asset_id = transaction_data.get_back_asset_id or uuid.UUID("d383faea-bf2a-4a07-8fb3-294bfb31daf8")  # Assuming USD
+        sell_target_asset_id = transaction_data.sell_target_asset_id
+        #get_back_asset_id = transaction_data.get_back_asset_id  # Asset to receive, e.g., USD
         amount = transaction_data.amount
-        current_selling_price = transaction_data.current_selling_price
+        label = 'USD=X'
 
-        # Validate user exists
         user = self.db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        # Validate target asset exists
         target_asset = self.db.query(Asset).filter(Asset.id == sell_target_asset_id).first()
         if not target_asset:
             raise HTTPException(status_code=404, detail="Target asset not found")
 
-        # Validate get_back_asset exists (e.g., USD)
-        get_back_asset = self.db.query(Asset).filter(Asset.id == get_back_asset_id).first()
+        try:
+            stock = yf.Ticker(target_asset.label) 
+            data = stock.history(period="1d")
+            if data.empty:
+                raise ValueError("No data retrieved for the asset.")
+            current_selling_price = data['Close'].iloc[-1]
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Failed to retrieve current price: {str(e)}")
+
+        get_back_asset = self.db.query(Asset).filter(Asset.label == label).first()
         if not get_back_asset:
             raise HTTPException(status_code=404, detail="Get back asset not found")
 
-        # Check that the user has sufficient asset to sell
+        #  sufficient asset to sell
         user_target_asset = self.db.query(UserAsset).filter(
             UserAsset.user_id == user_id, UserAsset.asset_id == sell_target_asset_id
         ).first()
@@ -274,37 +294,25 @@ class TransactionService:
         previous_average_price = user_target_asset.average_price
         total_value_after = previous_total_value - amount
 
-        # Calculate cost basis before sale (total cost of holdings)
-        cost_basis_before = previous_total_value * previous_average_price
-
-        # Calculate proceeds from the sale
         proceeds = amount * current_selling_price
 
-        # Adjust the cost basis after sale by removing the cost of the sold assets
-        cost_basis_sold = amount * previous_average_price
-        cost_basis_after = cost_basis_before - proceeds
-
-        # Update average_price
+        user_target_asset.total_value = total_value_after
         if total_value_after > 0:
-            user_target_asset.average_price = cost_basis_after / total_value_after
+            user_target_asset.average_price = previous_average_price
         else:
             user_target_asset.average_price = 0.0
 
-        # Update total_value
-        user_target_asset.total_value = total_value_after
-
-        # Add the proceeds to user's get_back_asset (e.g., USD)
         user_get_back_asset = self.db.query(UserAsset).filter(
-            UserAsset.user_id == user_id, UserAsset.asset_id == get_back_asset_id
+            UserAsset.user_id == user_id, UserAsset.asset_id == get_back_asset.id
         ).first()
         if user_get_back_asset:
             user_get_back_asset.total_value += proceeds
         else:
             user_get_back_asset = UserAsset(
                 user_id=user_id,
-                asset_id=get_back_asset_id,
+                asset_id=get_back_asset.id,
                 total_value=proceeds,
-                average_price=1.0  # Assuming USD has average price of 1.0
+                average_price=1.0 #usd to usd only
             )
             self.db.add(user_get_back_asset)
 
@@ -312,11 +320,11 @@ class TransactionService:
         transaction = Transaction(
             id=uuid.uuid4(),
             user_id=user_id,
-            asset_id=sell_target_asset_id,  # Asset being sold
+            asset_id=sell_target_asset_id, 
             transaction_type="sell",
             amount=amount,
             timestamp=datetime.utcnow(),
-            price = current_selling_price
+            price=current_selling_price
         )
         self.db.add(transaction)
 
@@ -326,6 +334,9 @@ class TransactionService:
             return transaction
         except Exception as e:
             self.db.rollback()
-            raise HTTPException(status_code=400, detail="Transaction failed: " + str(e))
+            raise HTTPException(status_code=400, detail=f"Transaction failed: {str(e)}")
+        
+
+
         
 
