@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAssetStore } from '../store/assetStore'; // Adjust the path based on your project structure
 //        @click="goToAsset(asset.id)"
@@ -26,7 +26,7 @@ const assetStore = useAssetStore();
 const router = useRouter();
 
 // Access the reactive state directly
-const assets = assetStore.allAssets;
+const assets =computed(()=> assetStore.allAssets);
 
 // Fetch assets when the component is mounted
 onMounted(async () => {
