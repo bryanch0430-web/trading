@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime
 import uuid
 class AssetBase(BaseModel):
@@ -11,6 +11,10 @@ class AssetBase(BaseModel):
 class AssetCreate(BaseModel):
     label: str
 
+class UserAssetTypeDistribution(BaseModel):
+asset_type_values: Dict[str, float]
+total_value: float
+asset_type_percentages: Dict[str, float]
 
 class AssetOut(BaseModel):
     id: int
