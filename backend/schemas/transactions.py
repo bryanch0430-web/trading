@@ -22,27 +22,25 @@ class TransactionCreate(BaseModel):
 
 
 class BuyTransactionCreate(BaseModel):
-    buy_target_asset_id: Optional[uuid.UUID] 
-    use_asset_id: Optional[uuid.UUID]  # currently must be USD
-    amount: float = Field(..., gt=0, description="Amount must be greater than zero")
-    current_buying_price: float = Field(..., gt=0, description="Amount must be greater than zero")
-    user_id: Optional[uuid.UUID] 
+    buy_target_asset_id: uuid.UUID
+    #use_asset_id: Optional[uuid.UUID]   # Asset used for purchasing, e.g., USD
+    amount: float = Field(..., gt=0, description="Amount of asset to buy")
+    user_id: uuid.UUID
 
 class SellTransactionCreate(BaseModel):
-    sell_target_asset_id: Optional[uuid.UUID] 
-    get_back_asset_id: Optional[uuid.UUID]  # currently must be USD
-    amount: float = Field(..., gt=0, description="Amount must be greater than zero")
-    current_selling_price: float = Field(..., gt=0, description="Amount must be greater than zero")
-    user_id: Optional[uuid.UUID] 
+    sell_target_asset_id: uuid.UUID
+    #get_back_asset_id: Optional[uuid.UUID]   # Asset to receive, e.g., USD
+    amount: float = Field(..., gt=0, description="Amount of asset to sell")
+    user_id: uuid.UUID
 
 class DepositTransactionCreate(BaseModel):
-    asset_id: Optional[uuid.UUID] 
+    # asset_id: Optional[uuid.UUID] 
     amount: float = Field(..., gt=0, description="Amount must be greater than zero")
     deposit_pricing: Optional[float]
     user_id: Optional[uuid.UUID] 
 
 class WithdrawTransactionCreate(BaseModel):
-    asset_id: Optional[uuid.UUID] 
+    # asset_id: Optional[uuid.UUID] 
     amount: float = Field(..., gt=0, description="Amount must be greater than zero")
     user_id: Optional[uuid.UUID] 
 
@@ -51,10 +49,10 @@ class TransactionResponse(BaseModel):
     id: uuid.UUID
     user_id: uuid.UUID
     asset_id: Optional[uuid.UUID]
-    asset_name:str
+    asset_name: Optional[str]
     transaction_type: TransactionType
     amount: float
-    price: float
+    price: Optional[float]
     timestamp: datetime
 
     class Config:
