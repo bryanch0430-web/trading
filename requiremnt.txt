@@ -2,10 +2,10 @@ fastapi
 pydantic
 SQLAlchemy
 passlib[bcrypt]
-apscheduler 
+apscheduler
 pytz
 uvicorn
 pydantic[email]
 psycopg2
 pandas
-yfinacne
+yfinance
