@@ -7,6 +7,7 @@ from schemas.transactions import (
     DepositTransactionCreate,
     WithdrawTransactionCreate,
     TransactionResponse,
+    UserTransactionResponse
 )
 from database import get_db
 import uuid
@@ -28,29 +29,32 @@ def get_transactions(
     transactions = service.get_all_transactions(user_id, skip, limit)
     return transactions
 
-@router.post("/deposit", response_model=TransactionResponse)
+@router.post("/deposit", response_model=UserTransactionResponse)
 def deposit(transaction_data: DepositTransactionCreate, db: Session = Depends(get_db)):
     service = TransactionService(db)
     transaction = service.deposit(transaction_data)
     return transaction
 
-@router.post("/withdraw", response_model=TransactionResponse)
+@router.post("/withdraw", response_model=UserTransactionResponse)
 def withdraw(transaction_data: WithdrawTransactionCreate, db: Session = Depends(get_db)):
     service = TransactionService(db)
     transaction = service.withdraw(transaction_data)
     return transaction
 
-@router.post("/buy", response_model=TransactionResponse)
+@router.post("/buy", response_model=UserTransactionResponse)
 def buy(transaction_data: BuyTransactionCreate, db: Session = Depends(get_db)):
     service = TransactionService(db)
     transaction = service.buy(transaction_data)
     return transaction
 
-@router.post("/sell", response_model=TransactionResponse)
+@router.post("/sell", response_model=UserTransactionResponse)
 def sell(transaction_data: SellTransactionCreate, db: Session = Depends(get_db)):
     service = TransactionService(db)
     transaction = service.sell(transaction_data)
     return transaction
+
+
+
 
 
 
