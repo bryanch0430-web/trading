@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from schemas.assets import AssetDetails,AssetCreate,UserAssetDisplayResponse, ListUserAssetDisplayResponse
+from schemas.assets import AssetDetails,AssetCreate,UserAssetDisplayResponse, ListUserAssetDisplayResponse,UserAssetTypeDistribution
 from model import Asset, UserAsset
 from typing import List, Optional
 import pandas as pd
