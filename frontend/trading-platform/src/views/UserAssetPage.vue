@@ -1,22 +1,29 @@
 <template>
-  <div class="container">
-    <h1>User Assets</h1>
-    <TotalValue :totalValue="totalValue" />
-    
-    <!-- Responsive layout for ValueTrend and TypeDistribution -->
-    <div class="charts-container">
-      <ValueTrend :trendData="trendData" />
-      <TypeDistribution :distributionData="distributionData" />
-    </div>
+  <!-- Show loading spinner while data is being fetched -->
+  <div v-if="loading" class="loading-spinner">
+    <p>Loading assets...</p>
+    <!-- Add a spinner or animation here -->
+  </div>
 
-    <!-- Show loading spinner while data is being fetched -->
-    <div v-if="loading" class="loading-spinner">
-      <p>Loading assets...</p>
-      <!-- Add a spinner or animation here -->
+  <div v-else class="container">
+    <h1>User Assets</h1>
+    
+    <!-- Only render asset distribution components if assetDistribution exists -->
+    <div v-if="assetDistribution">
+      <TotalValue :totalValue="assetDistribution.total_value" />
+      
+      <!-- Responsive layout for ValueTrend and TypeDistribution -->
+      <div class="charts-container">
+        <ValueTrend :trendData="trendData" />
+        <TypeDistribution :distributionData="assetDistribution.asset_type_values" />
+      </div>
+    </div>
+    <div v-else>
+      <p>No asset distribution data available</p>
     </div>
 
     <!-- Show assets once data is loaded -->
-    <div v-else class="assets-list">
+    <div class="assets-list">
       <AssetCard v-for="asset in assets" :key="asset.id" :asset="asset" />
     </div>
   </div>
@@ -29,9 +36,9 @@ import TypeDistribution from '../components/TypeDistribution.vue';
 import AssetCard from '../components/AssetCard.vue';
 import { onMounted, computed } from 'vue';
 import { useUserStore } from '../store/userStore';
+import { useAssetStore } from '../store/assetStore';
 
-// Mock data
-const totalValue = 15000;
+// Sample mock data for other components
 const trendData = [
   { time: 'Jan', value: 10000 },
   { time: 'Feb', value: 11000 },
@@ -39,22 +46,18 @@ const trendData = [
   { time: 'Apr', value: 13000 },
   { time: 'May', value: 15000 },
 ];
-const distributionData = {
-  Bitcoin: 40,
-  Ethereum: 30,
-  Litecoin: 20,
-  Ripple: 10,
-};
 
-// Use the Pinia store
 const useStore = useUserStore();
+const assetStore = useAssetStore();
 
 // Fetch assets when the component is mounted
 onMounted(async () => {
   await useStore.fetchUserAssets();
+  await assetStore.calculateUserAsset();
 });
 
 // Compute assets and loading state from the store
+const assetDistribution = computed(() => assetStore.getAssetDistribution);
 const assets = computed(() => useStore.userAsset);
 const loading = computed(() => useStore.loading); // Get the loading state
 </script>
