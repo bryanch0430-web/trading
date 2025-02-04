@@ -6,12 +6,14 @@ export const useAssetStore = defineStore('asset', {
       assets: null,
       loading: false,
       error: null,
-      currentAsset:null
+      currentAsset:null,
+      assetDistribution: null
     }),
     getters: {
       allAssets: (state) => state.assets,
       getAssetById: (state) => (id) => state.assets.find((asset) => asset.id === id),
       getcurrentAsset: (state) => state.currentAsset, // Corrected here
+      getAssetDistribution: (state) => state.assetDistribution
     },
     actions: {
       async fetchAllAssets() {
@@ -54,7 +56,7 @@ export const useAssetStore = defineStore('asset', {
           this.loading = false;
         }
       },
-      async fetchUserAssets(userId) {
+      async fetchUserAssets(userId = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
         this.loading = true;
         this.error = null;
         try {
@@ -75,8 +77,24 @@ export const useAssetStore = defineStore('asset', {
           this.loading = false;
         }
       },
-
+      
+      async calculateUserAsset(userId = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
+        this.loading = true;
+        this.error = null;
+        try {
+          const data = await assetAPI.calculateUserAsset(userId);
+          console.log('API Response:', data);
+          this.assetDistribution = data;
+        } catch (error) {
+          console.error('Error in calculateUserAsset:', error);
+          this.error = 'Failed to calculate user asset distribution.';
+        } finally {
+          this.loading = false;
+        }
+      },
+      
     },
   });
   
   export default useAssetStore;
+
