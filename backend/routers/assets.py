@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from schemas.assets import AssetCreate, AssetDetails, UserAssetDisplayResponse,ListUserAssetDisplayResponse
+from schemas.assets import AssetCreate, AssetDetails, UserAssetDisplayResponse,ListUserAssetDisplayResponse, UserAssetTypeDistribution
 from utils.security import hash_password, verify_password
 from typing import List, Optional
 from datetime import datetime
@@ -84,3 +84,29 @@ def list_all_asset( db: Session = Depends(get_db)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred.",
         )
+
+
+ 
+
+@router.get("/calculate_asset_type_distribution/{user_id}", response_model=UserAssetTypeDistribution)
+def get_asset_type_distribution(user_id: uuid.UUID, db: Session = Depends(get_db)):
+    service = AssetService(db)
+
+    try:
+        # Call the calculate_asset_type_distribution function
+        distribution = AssetService.calculate_asset_type_distribution(db, user_id)
+        
+        if not distribution:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No assets found for user with ID {user_id}.",
+            )
+        
+        return distribution
+    
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}",)
