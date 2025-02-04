@@ -1,11 +1,10 @@
-import axios from "axios";
+import http from "./jwtHttp.js";
 
-const API_BASE_URL = "http://localhost:8000";
 
 async function ListUserAsset(userid) {
     try {
-      const requestUrl = `${API_BASE_URL}/users/${userid}/assets`;
-      const response = await axios.get(requestUrl);
+      const requestUrl = `/users/${userid}/assets`;
+      const response = await http.get(requestUrl);
       console.log(response.data)
       return response.data
     } catch (error) {
