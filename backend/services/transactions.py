@@ -304,7 +304,7 @@ class TransactionService:
         # Update user's target asset holdings
         user_target_asset.total_value = total_value_after
         if total_value_after > 0:
-            user_target_asset.average_price = previous_average_price
+            user_target_asset.average_price = (float(previous_total_value * previous_average_price)-proceeds)/ (total_value_after)
         else:
             user_target_asset.average_price = 0.0
 
@@ -314,6 +314,7 @@ class TransactionService:
         ).first()
         if user_get_back_asset:
             user_get_back_asset.total_value = float(user_get_back_asset.total_value + amount) 
+
              #user_get_back_asset.average_price = # Convert to native Python float
         else:
             user_get_back_asset = UserAsset(
