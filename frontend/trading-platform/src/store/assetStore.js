@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ListAsset, ListAssetPrice, getUserAssets } from '../api/assetAPI';
+import assetAPI from '../api/assetAPI';
 
 export const useAssetStore = defineStore('asset', {
     state: () => ({
@@ -18,7 +18,7 @@ export const useAssetStore = defineStore('asset', {
         this.loading = true;
         this.error = null;
         try {
-          const data = await ListAsset();
+          const data = await assetAPI.ListAsset();
           console.log(data);
           
           // **Transform Data Here**
@@ -42,7 +42,7 @@ export const useAssetStore = defineStore('asset', {
         this.loading = true;
         this.error = null;
         try {
-          const data = await ListAssetPrice(assetId);
+          const data = await assetAPI.ListAssetPrice(assetId);
           this.currentAsset = data;
           
           console.log(`Fetched price for asset ID ${assetId}:`, this.currentAsset);
@@ -58,7 +58,7 @@ export const useAssetStore = defineStore('asset', {
         this.loading = true;
         this.error = null;
         try {
-          const data = await getUserAssets(userId);
+          const data = await assetAPI.getUserAssets(userId);
           console.log(`Fetched assets for user ${userId}:`, data);
   
           if (Array.isArray(data)) {
