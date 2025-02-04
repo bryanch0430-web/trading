@@ -23,6 +23,8 @@
     </div>
 
     <!-- Show assets once data is loaded -->
+    <h3 class="asset-card-title">Asset Details</h3>
+
     <div class="assets-list">
       <AssetCard v-for="asset in assets" :key="asset.id" :asset="asset" />
     </div>
@@ -266,7 +268,12 @@ h1 {
   cursor: pointer;
   font-size: 16px;
 }
-
+.asset-card-title {
+  font-size: 1.15rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #BB86FC;
+}
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
   .charts-container > * {
