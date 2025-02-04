@@ -85,7 +85,7 @@ class UserService:
         # Aggregate total_value by month
         query = self.db.query(
             func.date_trunc('month', ValueHistory.timestamp).label('month'),
-            func.avg(ValueHistory.total_value).label('average_value')  # Or use func.max for latest value
+            func.avg(ValueHistory.total_value).label('average_value')
         ).filter(
             ValueHistory.user_id == user_id
         ).group_by(
@@ -100,7 +100,7 @@ class UserService:
         trend_data = [
             MonthlyValueTrendResponse(
                 time=record.month.strftime("%Y-%m"),
-                value=round(record.average_value, 2)  # Rounded for better readability
+                value=round(record.average_value, 2)
             )
             for record in results
         ]
