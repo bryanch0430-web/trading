@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { fetchTransactions } from '../api/transactionAPI';
+import transactionAPI from '../api/transactionAPI';
 
 export const useTransactionStore = defineStore('transaction', {
   state: () => ({
@@ -15,7 +15,7 @@ export const useTransactionStore = defineStore('transaction', {
     async fetchUserTransactions(user_id = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
       this.loading = true;
       try {
-        const response = await fetchTransactions(user_id);
+        const response = await transactionAPI.fetchTransactions(user_id);
         this.transactions = response;
       } catch (error) {
         console.error('Error fetching transactions:', error);
@@ -25,3 +25,4 @@ export const useTransactionStore = defineStore('transaction', {
     },
   },
 });
+export default useTransactionStore;
