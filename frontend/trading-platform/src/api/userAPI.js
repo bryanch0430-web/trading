@@ -13,9 +13,19 @@ async function ListUserAsset(userid) {
   }
 
 
+async function ShowUserValueTrend(userid) {
+    try {
+      const requestUrl = `/users/${userid}/value-history`;
+      const response = await http.get(requestUrl);
+      return response
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      throw error; 
+    }
+  }
 export default {
-    ListUserAsset
+    ListUserAsset,
+    ShowUserValueTrend
     
 }
-
 
