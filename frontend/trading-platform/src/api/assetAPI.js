@@ -42,9 +42,9 @@ async function ListAsset() {
 
 async function calculateUserAsset(userId) {
     try {
-      const requestUrl = `${API_BASE_URL}/assets/calculate_asset_type_distribution/${userId}`;
-      const response = await axios.get(requestUrl);
-      return response.data;
+      const requestUrl = `/assets/calculate_asset_type_distribution/${userId}`;
+      const response = await http.get(requestUrl);
+      return response;
     } catch (error) {
       console.error(`Error fetching assets for user ID ${userId}:`, error);
       throw error;
@@ -58,5 +58,7 @@ export default {
     calculateUserAsset
     
 }
+
+
 
 
