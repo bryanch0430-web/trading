@@ -23,6 +23,67 @@ export const useTransactionStore = defineStore('transaction', {
         this.loading = false; 
       }
     },
+    async makeDeposit(depositData) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const transaction = await transactionAPI.depositTransaction(depositData);
+        // Optionally, update the state by adding the new transaction to the transactions list
+        //this.transactions.push(transaction);
+        return transaction;
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async makeWithdraw(withdrawData) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const transaction = await transactionAPI.withdrawTransaction(withdrawData);
+                //this.transactions.push(transaction);
+
+        return transaction;
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async makeBuy(buyData) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const transaction = await transactionAPI.buyTransaction(buyData);
+                //this.transactions.push(transaction);
+
+        return transaction;
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async makeSell(sellData) {
+      this.loading = true;
+      this.error = null;
+      try {
+        const transaction = await transactionAPI.sellTransaction(sellData);
+
+          //this.transactions.push(transaction);
+
+        return transaction;
+      } catch (error) {
+        this.error = error;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 });
 export default useTransactionStore;
+
