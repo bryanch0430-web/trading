@@ -112,7 +112,64 @@ class AssetService:
     
     def list_all_asset(self)-> Optional[Asset]:
          return self.db.query(Asset).all()
-    
+        
+    def calculate_asset_type_distribution(db: Session, user_id: uuid.UUID) -> Optional[UserAssetTypeDistribution]:
+
+        try:
+            user_assets = db.query(UserAsset).filter(UserAsset.user_id == user_id).all()
+            if not user_assets:
+                logger.info(f"No assets found for user {user_id}.")
+                return None
+
+            asset_type_values = {}
+            total_portfolio_value = 0.0
+
+            for user_asset in user_assets:
+                asset = db.query(Asset).filter(Asset.id == user_asset.asset_id).first()
+                if not asset:
+                    logger.warning(f"Asset with ID {user_asset.asset_id} not found in the database.")
+                    continue
+
+                try:
+                    ticker = yf.Ticker(asset.label)
+                    history = ticker.history(period="1d")
+                    if history.empty:
+                        logger.warning(f"No price data found for asset {asset.label}.")
+                        continue
+
+                    current_price = history['Close'].iloc[-1]
+                    asset_value = user_asset.total_value * current_price
+
+                    if asset.asset_type in asset_type_values:
+                        asset_type_values[asset.asset_type] += asset_value
+                    else:
+                        asset_type_values[asset.asset_type] = asset_value
+
+                    total_portfolio_value += asset_value
+
+                except Exception as e:
+                    logger.error(f"Error fetching price data for asset {asset.label}: {e}")
+                    continue
+
+            if total_portfolio_value == 0:
+                logger.info(f"Total portfolio value for user {user_id} is zero.")
+                return None
+
+            asset_type_percentages = {
+                asset_type: (value 
+                             / total_portfolio_value) * 100
+                for asset_type, value in asset_type_values.items()
+            }
+
+            return UserAssetTypeDistribution(
+                asset_type_values=asset_type_values,
+                total_value=total_portfolio_value,
+                asset_type_percentages=asset_type_percentages
+            )
+
+        except Exception as e:
+            logger.error(f"An error occurred while calculating asset type distribution: {e}")
+            return None
 
     # for data injectionnnnnnnnnnnnnnnnnn
     def import_assets_from_csv(self):
