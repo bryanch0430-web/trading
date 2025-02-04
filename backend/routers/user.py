@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from schemas.user import UserCreate, UserAuth, UserAssetResponse, UserTransactionResponse, UserValueHistoryResponse,UserRead
+from schemas.user import UserCreate, UserAuth, UserAssetResponse, UserTransactionResponse, UserValueHistoryResponse,UserRead,MonthlyValueTrendResponse
 from services.user import UserService
 from utils.security import hash_password, verify_password
 from typing import List, Optional
@@ -40,7 +40,7 @@ def get_assets(user_id: uuid.UUID, db: Session = Depends(get_db)):
 
 
 
-@router.get("/{user_id}/value-history", response_model=List[UserValueHistoryResponse])
+@router.get("/{user_id}/value-history", response_model=List[MonthlyValueTrendResponse])
 def get_value_history(
     user_id: uuid.UUID, 
     db: Session = Depends(get_db)
