@@ -49,7 +49,9 @@
 import { onMounted, computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAssetStore } from '../store/assetStore';
+import { useTransactionStore } from '../store/transactionStore';
 
+const transactionStore = useTransactionStore();
 const assetStore = useAssetStore();
 const route = useRoute();
 const router = useRouter();
@@ -78,12 +80,67 @@ onMounted(async () => {
   }
 });
 
-const buyAsset = () => {
-  // Your buy logic
+const buyAsset = async () => {
+  if (!isValidAmount.value) return;
+  
+  const payload = {
+    buy_target_asset_id: assetId,
+    amount: amount.value,
+    user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+  };
+  console.log(payload)
+  try {
+    const transaction = await transactionStore.makeBuy(payload);
+    
+    // Check if there was an error inside the store (if not thrown)
+    if (transactionStore.error) {
+      console.error('Buy transaction failed:', transactionStore.error);
+      message.value = "Buy transaction failed!";
+      messageType.value = "error";
+    } else {
+      console.log('Buy transaction successful:', transaction);
+      message.value = "Buy transaction successful!";
+      messageType.value = "success";
+      
+      // Route to '/assets' after successful transaction
+      router.push('/assets');
+    }
+  } catch (err) {
+    console.error('Buy transaction encountered an error:', err);
+    message.value = "Buy transaction encountered an error!";
+    messageType.value = "error";
+  }
 };
 
-const sellAsset = () => {
-  // Your sell logic
+const sellAsset = async () => {
+  if (!isValidAmount.value) return;
+  
+  const payload = {
+    sell_target_asset_id: assetId,
+    amount: amount.value,
+    user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+  };
+  
+  try {
+    const transaction = await transactionStore.makeSell(payload);
+    
+    if (transactionStore.error) {
+      console.error('Sell transaction failed:', transactionStore.error);
+      message.value = "Sell transaction failed!";
+      messageType.value = "error";
+    } else {
+      console.log('Sell transaction successful:', transaction);
+      message.value = "Sell transaction successful!";
+      messageType.value = "success";
+      
+      // Route to '/assets' after successful transaction
+      router.push('/assets');
+    }
+  } catch (err) {
+    console.error('Sell transaction encountered an error:', err);
+    message.value = "Sell transaction encountered an error!";
+    messageType.value = "error";
+  }
 };
 </script>
 <style scoped>
