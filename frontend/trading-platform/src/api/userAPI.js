@@ -5,8 +5,7 @@ async function ListUserAsset(userid) {
     try {
       const requestUrl = `/users/${userid}/assets`;
       const response = await http.get(requestUrl);
-      console.log(response.data)
-      return response.data
+      return response
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error; 
@@ -14,7 +13,7 @@ async function ListUserAsset(userid) {
   }
 
 
-  export{
+export default {
     ListUserAsset
     
 }
