@@ -16,7 +16,7 @@ export const useTransactionStore = defineStore('transaction', {
       this.loading = true;
       try {
         const response = await fetchTransactions(user_id);
-        this.transactions = response.data;
+        this.transactions = response;
       } catch (error) {
         console.error('Error fetching transactions:', error);
       } finally {
