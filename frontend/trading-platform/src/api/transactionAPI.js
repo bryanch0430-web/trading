@@ -6,7 +6,6 @@ async function fetchTransactions(user_id, skip = 0, limit = 25) {
   
       const response = await http.get(requestUrl);
   
-      console.log("Response Data:", response.data);
   
       return response
     } catch (error) {
@@ -18,7 +17,7 @@ async function fetchTransactions(user_id, skip = 0, limit = 25) {
 
 
 
-export{
+export default {
     fetchTransactions,
     
 }
