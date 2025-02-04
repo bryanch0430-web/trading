@@ -48,9 +48,10 @@
           />
         </div>
 
+        <!-- Use the same structure and classes as the sell and buy buttons -->
         <div class="button-group">
-          <button class="sell-button" @click="handleWithdraw">Withdraw</button>
-          <button class="buy-button" @click="handleDeposit">Deposit</button>
+          <button class="sell-button" @click="handleWithdraw" :disabled="!isValidAmount">Withdraw</button>
+          <button class="buy-button" @click="handleDeposit" :disabled="!isValidAmount" >Deposit</button>
         </div>
 
         <!-- Optionally display an error message -->
@@ -68,7 +69,6 @@ import TypeDistribution from '../components/TypeDistribution.vue';
 import AssetCard from '../components/AssetCard.vue';
 import { useUserStore } from '../store/userStore';
 import { useAssetStore } from '../store/assetStore';
-// Assume transactionAPI is imported from your API service.
 import transactionAPI from '../api/transactionAPI';
 
 const useStore = useUserStore();
@@ -84,6 +84,7 @@ const assetDistribution = computed(() => assetStore.getAssetDistribution);
 const assets = computed(() => useStore.userAsset);
 const userValueTrend = computed(() => useStore.getValueTrend);
 const loading = computed(() => useStore.loading);
+const isValidAmount = computed(() => amount.value > 0);
 
 // Modal and input states
 const showModal = ref(false);
@@ -103,9 +104,15 @@ async function handleDeposit() {
   processing.value = true;
   errorMsg.value = null;
   
-  const depositData = { amount: amount.value };
+  const payload = { 
+    amount: amount.value,
+    deposit_pricing: 1.0,
+    user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+
+
+   };
   try {
-    const transaction = await transactionAPI.depositTransaction(depositData);
+    const transaction = await transactionAPI.depositTransaction(payload);
     console.log('Deposit transaction:', transaction);
     closeModal();
   } catch (error) {
@@ -120,9 +127,12 @@ async function handleWithdraw() {
   processing.value = true;
   errorMsg.value = null;
   
-  const withdrawData = { amount: amount.value };
+  const payload = {
+     amount: amount.value,
+         user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+};
   try {
-    const transaction = await transactionAPI.withdrawTransaction(withdrawData);
+    const transaction = await transactionAPI.withdrawTransaction(payload);
     console.log('Withdraw transaction:', transaction);
     closeModal();
   } catch (error) {
@@ -212,15 +222,32 @@ h1 {
   gap: 16px;
 }
 
+/* Use the same button styling as seen in the trading section */
 .buy-button,
 .sell-button {
   flex: 1;
   padding: 10px;
   border: none;
   border-radius: 6px;
-  color: #BB86FC;
+  color: #fff;
   cursor: pointer;
   font-size: 16px;
+}
+
+/* Deposit (Buy) button style */
+.buy-button {
+  background-color: #28a745; /* Green */
+}
+
+/* Withdraw (Sell) button style */
+.sell-button {
+  background-color: #dc3545; /* Red */
+}
+
+.buy-button:disabled,
+.sell-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
 /* Additional style for the funds control button container */
