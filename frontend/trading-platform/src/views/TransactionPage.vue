@@ -10,7 +10,7 @@
 
     <!-- Show transactions once data is loaded -->
     <div v-else>
-      <div v-if="transactions.length">
+      <div v-if="transactions?.length">
         <div v-for="transaction in transactions" :key="transaction.id">
           <TransactionItem :transaction="transaction" />
         </div>
