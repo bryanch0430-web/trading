@@ -9,12 +9,12 @@
     <h1>User Assets</h1>
     
     <!-- Only render asset distribution components if assetDistribution exists -->
-    <div v-if="assetDistribution">
+    <div v-if="assetDistribution && userValueTrend">
       <TotalValue :totalValue="assetDistribution.total_value" />
       
       <!-- Responsive layout for ValueTrend and TypeDistribution -->
       <div class="charts-container">
-        <ValueTrend :trendData="trendData" />
+        <ValueTrend :trendData="userValueTrend" />
         <TypeDistribution :distributionData="assetDistribution.asset_type_values" />
       </div>
     </div>
@@ -54,13 +54,19 @@ const assetStore = useAssetStore();
 onMounted(async () => {
   await useStore.fetchUserAssets();
   await assetStore.calculateUserAsset();
+  await useStore.ShowUserValueTrend();
 });
 
 // Compute assets and loading state from the store
 const assetDistribution = computed(() => assetStore.getAssetDistribution);
 const assets = computed(() => useStore.userAsset);
+const userValueTrend = computed(() => useStore.getValueTrend);
+
+
 const loading = computed(() => useStore.loading); // Get the loading state
 </script>
+
+
 
 
 
