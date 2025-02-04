@@ -26,49 +26,112 @@
     <div class="assets-list">
       <AssetCard v-for="asset in assets" :key="asset.id" :asset="asset" />
     </div>
+    
+    <!-- Button to open the funds modal -->
+    <div class="funds-control">
+      <button @click="showModal = true" class="manage-funds-button">Manage Funds</button>
+    </div>
+
+    <!-- Modal pop out window for deposit and withdraw actions -->
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal">
+        <h2>Manage Funds</h2>
+
+        <div class="input-group">
+          <label for="amount">Amount:</label>
+          <input
+            v-model.number="amount"
+            id="amount"
+            type="number"
+            min="0"
+            placeholder="Enter amount"
+          />
+        </div>
+
+        <div class="button-group">
+          <button class="sell-button" @click="handleWithdraw">Withdraw</button>
+          <button class="buy-button" @click="handleDeposit">Deposit</button>
+        </div>
+
+        <!-- Optionally display an error message -->
+        <p v-if="errorMsg" class="alert">{{ errorMsg }}</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue';
 import TotalValue from '../components/TotalValue.vue';
 import ValueTrend from '../components/ValueTrend.vue';
 import TypeDistribution from '../components/TypeDistribution.vue';
 import AssetCard from '../components/AssetCard.vue';
-import { onMounted, computed } from 'vue';
 import { useUserStore } from '../store/userStore';
 import { useAssetStore } from '../store/assetStore';
-
-// Sample mock data for other components
-const trendData = [
-  { time: 'Jan', value: 10000 },
-  { time: 'Feb', value: 11000 },
-  { time: 'Mar', value: 12000 },
-  { time: 'Apr', value: 13000 },
-  { time: 'May', value: 15000 },
-];
+// Assume transactionAPI is imported from your API service.
+import transactionAPI from '../api/transactionAPI';
 
 const useStore = useUserStore();
 const assetStore = useAssetStore();
 
-// Fetch assets when the component is mounted
 onMounted(async () => {
   await useStore.fetchUserAssets();
   await assetStore.calculateUserAsset();
   await useStore.ShowUserValueTrend();
 });
 
-// Compute assets and loading state from the store
 const assetDistribution = computed(() => assetStore.getAssetDistribution);
 const assets = computed(() => useStore.userAsset);
 const userValueTrend = computed(() => useStore.getValueTrend);
+const loading = computed(() => useStore.loading);
 
+// Modal and input states
+const showModal = ref(false);
+const amount = ref(0);
+const errorMsg = ref(null);
+const processing = ref(false);
 
-const loading = computed(() => useStore.loading); // Get the loading state
+// Function to close modal and reset states
+const closeModal = () => {
+  showModal.value = false;
+  amount.value = 0;
+  errorMsg.value = null;
+};
+
+// Handle deposit action
+async function handleDeposit() {
+  processing.value = true;
+  errorMsg.value = null;
+  
+  const depositData = { amount: amount.value };
+  try {
+    const transaction = await transactionAPI.depositTransaction(depositData);
+    console.log('Deposit transaction:', transaction);
+    closeModal();
+  } catch (error) {
+    errorMsg.value = error.message || 'Deposit failed. Please try again.';
+  } finally {
+    processing.value = false;
+  }
+}
+
+// Handle withdraw action
+async function handleWithdraw() {
+  processing.value = true;
+  errorMsg.value = null;
+  
+  const withdrawData = { amount: amount.value };
+  try {
+    const transaction = await transactionAPI.withdrawTransaction(withdrawData);
+    console.log('Withdraw transaction:', transaction);
+    closeModal();
+  } catch (error) {
+    errorMsg.value = error.message || 'Withdrawal failed. Please try again.';
+  } finally {
+    processing.value = false;
+  }
+}
 </script>
-
-
-
-
 
 <style scoped>
 .container {
@@ -86,14 +149,13 @@ h1 {
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 24px;
-  justify-content: center; /* Center the charts horizontally */
+  justify-content: center;
 }
 
-/* Style for individual chart components */
 .charts-container > * {
-  flex: 1 1 300px; /* Allow charts to shrink for smaller screens */
-  max-height: 400px; /* Limit height for better layout */
-  min-width: 300px; /* Ensure charts fit neatly on small screens */
+  flex: 1 1 300px;
+  max-height: 400px;
+  min-width: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -105,10 +167,83 @@ h1 {
   gap: 16px;
 }
 
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: var(--color-panel);
+  padding: 24px;
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 400px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.input-group input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Button Group Styles */
+.button-group {
+  display: flex;
+  gap: 16px;
+}
+
+.buy-button,
+.sell-button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  color: #BB86FC;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Additional style for the funds control button container */
+.funds-control {
+  margin: 24px 0;
+  text-align: center;
+}
+
+/* Optional style override for the manage funds button */
+.manage-funds-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: var(--color-panel);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 16px;
+}
+
 /* Responsive adjustments for smaller screens */
 @media (max-width: 768px) {
   .charts-container > * {
-    flex: 1 1 100%; /* Stack charts vertically on small screens */
+    flex: 1 1 100%;
   }
 }
 </style>
