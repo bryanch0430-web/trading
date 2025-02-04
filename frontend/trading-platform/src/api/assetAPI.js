@@ -8,7 +8,7 @@ async function ListAsset() {
       const response = await http.get(requestUrl);
   
   
-      return response.data
+      return response
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error; 
@@ -21,7 +21,7 @@ async function ListAsset() {
   
       const response = await http.get(requestUrl);
   
-      return response.data
+      return response
     } catch (error) {
       console.error("Error fetching transactions:", error);
       throw error; 
@@ -33,16 +33,29 @@ async function ListAsset() {
     try {
       const requestUrl = `/assets/get_user_asset?user_id=${userId}`;
       const response = await http.get(requestUrl);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching assets for user ID ${userId}:`, error);
+      throw error;
+    }
+  }
+
+async function calculateUserAsset(userId) {
+    try {
+      const requestUrl = `${API_BASE_URL}/assets/calculate_asset_type_distribution/${userId}`;
+      const response = await axios.get(requestUrl);
       return response.data;
     } catch (error) {
       console.error(`Error fetching assets for user ID ${userId}:`, error);
       throw error;
     }
   }
-export{
+
+export default {
     ListAsset,
     ListAssetPrice,
-    getUserAssets
+    getUserAssets,
+    calculateUserAsset
     
 }
 
