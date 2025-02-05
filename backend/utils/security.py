@@ -7,7 +7,7 @@ from pydantic import BaseModel
 import jwt
 from sqlalchemy.orm import Session
 
-SECRET_KEY = "YOUR_SECRET_KEY"  
+SECRET_KEY = "SECRET_KEY"  
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60  
 
