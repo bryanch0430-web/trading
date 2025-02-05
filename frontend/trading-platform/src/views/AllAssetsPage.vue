@@ -88,7 +88,6 @@ const handleCreateAsset = async () => {
   try {
     await assetStore.createAsset(assetLabel.value);
     await assetStore.fetchAllAssets(currentUserId);
-    await sleep(1000); 
     closeModal();
   } catch (error) {
     console.error("Error creating asset:", error);
