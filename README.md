@@ -1,6 +1,9 @@
-# Simulated Trading Platform
+# Real-Time Asset Management & Simulated Trading Platform & Predictive Analytics
 
 Simulated Trading Platform is a simulation trading platform that enables users to create an account, log in, manage their assets and funds, and execute simulated buy/sell transactions using USD. The platform includes both a backend service (powered by Python FastAPI and PostgreSQL) and a frontend application (using Vue.js).
+
+Additionally, there's an experimental Python function for crypto price prediction included in the repository, although it is not integrated into the deployed application at this time.
+
 
 ## Table of Contents
 
@@ -145,3 +148,65 @@ trading
 - **Backend:** Contains Python modules for routing, data schemas, services, and utility functions for the trading simulation.
 - **Frontend:** Houses the trading platform’s client-side code with components, routing, state management, and views for user interaction.
 
+---
+
+**Additional Predictive Analytics (Experimental):**
+
+An experimental crypto price prediction function is available in the repository. Although it's not integrated into the deployed application, you can try it out locally by following these steps:
+
+1. Navigate to the `Prediction` folder.
+2. Install the additional dependencies by running:
+    
+    ```bash
+    pip install -r additional_requirements.txt
+    
+    ```
+    
+3. Run the prediction script:
+    
+    ```bash
+    python Crypto.py
+    
+    ```
+    
+
+By default, the script uses the following tickers:
+
+```python
+setTicker = ['JASMY-USD', 'ENS-USD', 'BNB-USD', 'SOL-USD', 'MSTR', 'BTC-USD', 'ETH-USD']
+
+```
+
+You can modify this list to predict for different cryptocurrencies. For example, the output might look like this:
+
+```
+Processing JASMY-USD
+R-squared (R²): 0.9646150469779968
+Root Mean Squared Error (RMSE): 0.0975302741995915
+Processing ENS-USD
+R-squared (R²): 0.9369181394577026
+Root Mean Squared Error (RMSE): 2.4010781528792706
+Processing BNB-USD
+R-squared (R²): 0.9241467714309692
+Root Mean Squared Error (RMSE): 44.71335844944019
+Processing SOL-USD
+R-squared (R²): 0.9618353247642517
+Root Mean Squared Error (RMSE): 10.774511736009853
+Processing MSTR
+R-squared (R²): 0.9533594846725464
+Root Mean Squared Error (RMSE): 4.585159469709957
+Processing BTC-USD
+R-squared (R²): -2.3547894954681396
+Root Mean Squared Error (RMSE): 28065.625950617956
+Processing ETH-USD
+R-squared (R²): 0.6672559976577759
+Root Mean Squared Error (RMSE): 641.7567198713232
+
+```
+
+![Screenshot 2025-02-06 002945](https://github.com/user-attachments/assets/dadcc5c4-5c28-47a0-a268-b95f53e91f8b)
+
+
+Feel free to adjust the `setTicker` list in `Crypto.py` to test with other crypto assets.
+
+---
