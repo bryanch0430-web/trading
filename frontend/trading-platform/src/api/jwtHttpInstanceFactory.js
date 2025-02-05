@@ -21,26 +21,33 @@
       }
     );
 
-    // Response interceptor (without handling 401 errors)
     instance.interceptors.response.use(
       function (response) {
         const isRequestSuccess =
           response.status === 200 || response.status === 201;
-
+  
         if (isRequestSuccess) {
           return Promise.resolve(response.data); // Resolve with response data
         }
-
+  
         return Promise.reject(response); // Reject the promise for non-successful responses
       },
       function (error) {
-        // Forward the error to the caller without handling 401 errors
-        return Promise.reject(error);
+        if (error.response && error.response.status === 401) {
+          const authStore = useAuthStore();
+          authStore.logout();
+          // Optionally, redirect to login page
+          alert("Account information incorrect, please login again.");
+          window.location.href = '/';
+        }
+        return Promise.reject(error); // Forward the error to the caller
       }
     );
-
+  
     return instance;
   }
 
   export default jwtHttpInstanceFactory;
+
+
 
