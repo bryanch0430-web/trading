@@ -92,9 +92,27 @@ export const useAssetStore = defineStore('asset', {
           this.loading = false;
         }
       },
+      async createAsset(label) {
+        this.loading = true;
+        this.error = null;
+        try {
+            const payload={
+              "label":label
+            }
+          const data = await assetAPI.createAsset(payload);
+          console.log("Asset created successfully:", data);
+        } catch (error) {
+          console.error("Error creating asset:", error);
+          this.error = "Failed to create asset.";
+        } finally {
+          this.loading = false;
+        }
+      },
       
     },
   });
   
   export default useAssetStore;
+
+
 
