@@ -4,6 +4,11 @@ Simulated Trading Platform is a simulation trading platform that enables users t
 
 Additionally, there's an experimental Python function for crypto price prediction included in the repository, although it is not integrated into the deployed application at this time.
 
+## Overview
+
+| Real-Time Asset Management | Simulated Trading Platform | Predictive Analytics |
+| -------------------------- | -------------------------- | -------------------- |
+| **Real-Time Asset Management** allows users to monitor and manage their assets and funds (in USD) in real time. It includes deposit/withdrawal functionality and detailed asset information views. | **Simulated Trading Platform** is a complete simulation system where users can create accounts, log in, view assets, and execute simulated buy/sell transactions. The backend is powered by Python FastAPI with PostgreSQL, and the frontend is built using Vue.js. | **Predictive Analytics (Experimental)** is an additional module containing a Python function for crypto price prediction. Although not integrated into the deployed application, it allows users to run prediction scripts locally. |
 
 ## Table of Contents
 
@@ -16,7 +21,7 @@ Additionally, there's an experimental Python function for crypto price predictio
   - [User Flow & Routes](#user-flow--routes)
 - [Database Configuration](#database-configuration)
 - [Project Structure](#project-structure)
-
+- [Additional Predictive Analytics (Experimental)](#additional-predictive-analytics-experimental)
 
 ## Features
 
