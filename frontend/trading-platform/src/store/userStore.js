@@ -16,7 +16,7 @@ export const useUserStore = defineStore('user', {
     },
   },
   actions: {
-    async fetchUserAssets(user_id = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
+    async fetchUserAssets(user_id) {
       this.loading = true; // Set loading to true when fetching starts
       try {
         const response = await userAPI.ListUserAsset(user_id);
@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
       }
     },
 
-    async ShowUserValueTrend(user_id = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
+    async ShowUserValueTrend(user_id) {
       this.loading = true; // Set loading to true when fetching starts
       try {
         const response = await userAPI.ShowUserValueTrend(user_id);
