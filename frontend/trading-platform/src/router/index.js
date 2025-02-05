@@ -8,7 +8,7 @@ import { useAuthStore } from '../store/authStore';
 
 const routes = [
   {
-    path: '/',
+    path: '/transacts',
     name: 'Transactions',
     component: TransactionPage,
     meta: { requiresAuth: true },
@@ -32,7 +32,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     component: LoginPage,
   },
@@ -51,7 +51,7 @@ router.beforeEach((to, from, next) => {
     next({ name: 'Login' });
   } else if (to.name === 'Login' && authStore.isLoggedIn) {
     // Optionally redirect already logged in users away from the login page
-    next({ name: 'Transactions' });
+    next({ name: 'UserAssets' });
   } else {
     next();
   }
