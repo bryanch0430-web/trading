@@ -240,9 +240,8 @@ input[type='email'] {
 }
 
 .modal {
-   background-color: #f9f9f9; 
+  background-color: var(--color-background);
   padding: 24px;
-  border-radius: 8px;
   width: 90%;
   max-width: 400px;
 }

@@ -18,7 +18,7 @@
       <p>No asset distribution data available</p>
     </div>
 
-    <h3 class="asset-card-title">Asset Details</h3>
+    <h3 class="asset-card-title">Holding Asset Details</h3>
 
     <div class="assets-list">
       <AssetCard v-for="asset in assets" :key="asset.id" :asset="asset" />
@@ -180,9 +180,10 @@ h1 {
 }
 
 .modal {
-  background-color: var(--color-panel);
+  /* background-color: var(--color-background); */
   padding: 24px;
-  border-radius: var(--border-radius);
+  /* border: 1px solid #ccc; */
+  /* border-radius: var(--border-radius); */
   width: 90%;
   max-width: 400px;
 }
