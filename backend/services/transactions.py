@@ -82,7 +82,6 @@ class TransactionService:
         if not asset:
             raise HTTPException(status_code=404, detail="Asset not found")
         transaction = Transaction(
-            id=uuid.uuid4(),
             user_id=user_id,
             asset_id=asset.id,
             transaction_type="deposit",
