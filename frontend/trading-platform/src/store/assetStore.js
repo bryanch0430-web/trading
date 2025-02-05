@@ -56,7 +56,7 @@ export const useAssetStore = defineStore('asset', {
           this.loading = false;
         }
       },
-      async fetchUserAssets(userId = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
+      async fetchUserAssets(userId) {
         this.loading = true;
         this.error = null;
         try {
@@ -78,7 +78,7 @@ export const useAssetStore = defineStore('asset', {
         }
       },
       
-      async calculateUserAsset(userId = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
+      async calculateUserAsset(userId) {
         this.loading = true;
         this.error = null;
         try {
