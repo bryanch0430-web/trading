@@ -61,6 +61,7 @@ const messageType = ref('');
 const loading = computed(() => assetStore.loading);
 const error = computed(() => assetStore.error);
 const asset = computed(() => assetStore.getcurrentAsset);
+const currentUserId = localStorage.getItem('userId');
 
 const isValidAmount = computed(() => amount.value > 0);
 const assetId = route.params.id;
@@ -86,7 +87,7 @@ const buyAsset = async () => {
   const payload = {
     buy_target_asset_id: assetId,
     amount: amount.value,
-    user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+    user_id: currentUserId
   };
   console.log(payload)
   try {
@@ -118,7 +119,7 @@ const sellAsset = async () => {
   const payload = {
     sell_target_asset_id: assetId,
     amount: amount.value,
-    user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+    user_id: currentUserId
   };
   
   try {
