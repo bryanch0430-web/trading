@@ -40,13 +40,14 @@
 import { onMounted, computed } from 'vue';
 import { useTransactionStore } from '../store/transactionStore';
 import TransactionItem from '../components/TransactionItem.vue';
+const currentUserId = localStorage.getItem('userId');
 
 // Use the Pinia store
 const transactionStore = useTransactionStore();
 
 // Fetch transactions when the component is mounted
 onMounted(async() => {
-  await transactionStore.fetchUserTransactions();
+  await transactionStore.fetchUserTransactions(currentUserId);
 });
 
 // Compute transactions and loading state from the store
