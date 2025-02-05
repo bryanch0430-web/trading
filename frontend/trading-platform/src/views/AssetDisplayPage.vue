@@ -18,7 +18,7 @@
     </div>
 
     <!-- Trading Section -->
-    <div v-if="asset?.name == 'USD=X'"class="trading-section">
+    <div v-if="asset?.name != 'USD=X'"class="trading-section">
       <h2>Trade {{ asset?.name }}</h2>
       <div class="input-group">
         <label for="amount">Amount:</label>
