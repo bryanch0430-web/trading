@@ -103,8 +103,9 @@ pip install -r requirements.txt
 ![Screenshot 2025-02-05 201431](https://github.com/user-attachments/assets/eb03e745-88a3-450b-8420-ecef1bd59f5c)
 ![Screenshot 2025-02-05 201511](https://github.com/user-attachments/assets/24075609-ff29-4386-97c1-1c7943eece4f)
 
-- **Asset Transaction:**  
+- **Asset Transaction: (`/all-assets/:id`):**  
   Users can click on an asset to view its details, where they can specify an amount to buy or sell the asset using USD.  
+![Screenshot 2025-02-05 201532](https://github.com/user-attachments/assets/9555c5ec-fe23-4475-8ee3-56333d147d50)
 
 - **Transaction History (`/transacts`):**  
   Post any transaction, users can check the transaction history and details on the `/transacts` route.
