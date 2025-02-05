@@ -1,7 +1,9 @@
 <template>
   <div class="container">
-    <h1>All Assets</h1>
-    <button class="manage-funds-button" @click="openModal">Create Asset</button>
+    <div class="header-row">
+      <h1>All Assets</h1>
+      <button class="manage-funds-button" @click="openModal">Add Asset</button>
+    </div>
 
     <div class="assets-list">
       <div
@@ -18,10 +20,11 @@
     </div>
   </div>
 
-  <!-- Create Asset Modal -->
+  <!-- Create Asset Modal (Label as in Yahoo Finance)-->
   <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
     <div class="modal">
       <h2>Create Asset</h2>
+      <p class="info-text">Note: The asset label refers to the label used at Yahoo Finance.</p>
       <div class="input-group">
         <label for="asset-label">Asset Label:</label>
         <input
@@ -31,6 +34,8 @@
           placeholder="Enter asset label"
         />
       </div>
+      <!-- Display error message if asset creation fails -->
+      <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
       <div class="button-group">
         <button class="sell-button" @click="closeModal">Cancel</button>
         <button class="buy-button" @click="handleCreateAsset" :disabled="!assetLabel">
@@ -50,10 +55,11 @@ const assetStore = useAssetStore();
 const router = useRouter();
 const currentUserId = localStorage.getItem('userId');
 
-// Reactive state for assets and modal visibility
+// Reactive state for assets, modal visibility, asset label and error message
 const assets = computed(() => assetStore.allAssets);
 const showModal = ref(false);
 const assetLabel = ref("");
+const errorMessage = ref("");
 
 // Fetch assets on component mount
 onMounted(async () => {
@@ -67,25 +73,31 @@ const goToAsset = (id) => {
 
 // Modal control functions
 const openModal = () => {
+  errorMessage.value = "";
   showModal.value = true;
 };
 
 const closeModal = () => {
   showModal.value = false;
   assetLabel.value = "";
+  errorMessage.value = "";
 };
 
-// Handle asset creation
+// Handle asset creation with error handling
 const handleCreateAsset = async () => {
   try {
     await assetStore.createAsset(assetLabel.value);
     await assetStore.fetchAllAssets(currentUserId);
+    await sleep(1000); 
     closeModal();
   } catch (error) {
     console.error("Error creating asset:", error);
+    // Optionally, you could check for specific error details here
+    errorMessage.value = error?.response?.data?.message || "Failed to create asset. Please try again.";
   }
 };
 </script>
+
 
 <style scoped>
 .container {
@@ -99,13 +111,19 @@ h1 {
   margin-bottom: 24px;
 }
 
-/* Button for creating an asset */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
 .manage-funds-button {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
-  background-color: var(--color-panel);
-  color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: #fff;
   cursor: pointer;
   font-size: 16px;
   margin-bottom: 24px;
@@ -211,4 +229,16 @@ h1 {
     flex-direction: column;
   }
 }
+
+.error-message {
+  color: red;
+  margin-bottom: 1rem;
+}
+
+.info-text {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
 </style>
+
