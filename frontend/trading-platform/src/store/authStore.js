@@ -52,7 +52,22 @@ export const useAuthStore = defineStore('auth', {
         this.logout();
       }
     },
+    async register(username, email, password) {
+      try {
+        const payload = {
+          username: username,
+          email: email,
+          password: password,
+        };
+        const response = await authApi.registerUser(payload);
 
+        console.log("User registered successfully:", response);
+        return response; // Return the response for success feedback
+      } catch (error) {
+        console.error("Registration failed:", error);
+        throw error;
+      }
+    },
   },
   getters: {
     isLoggedIn: (state) => !!state.token,
@@ -60,3 +75,4 @@ export const useAuthStore = defineStore('auth', {
 });
 
 export default useAuthStore;
+
