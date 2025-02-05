@@ -6,7 +6,7 @@ Additionally, there's an experimental Python function for crypto price predictio
 
 ## Overview
 
-| **Simulated Trading Platform (with Real-Time Asset Management)** | **Predictive Analytics (Experimental)** |
+| **Real-Time Asset Management in Simulated Trading Platform** | **Predictive Analytics (Experimental)** |
 | ------------------------------------------------------------------ | ----------------------------------------- |
 | This integrated platform combines simulated trading with real-time asset management. Users can create accounts, log in, monitor balances, execute simulated buy/sell transactions, and manage assets—with immediate updates and detailed asset information views. Deposits and withdrawals in USD are processed in real time to ensure consistent portfolio tracking. | This optional experimental module includes a Python function for cryptocurrency price prediction. It outputs key statistical metrics (e.g., R-squared and RMSE) for the prediction of various crypto assets. Although not part of the live trading system, it provides a sandbox for running prediction scripts locally and exploring alternative trading strategies. |
 
