@@ -12,7 +12,7 @@ export const useTransactionStore = defineStore('transaction', {
     },
   },
   actions: {
-    async fetchUserTransactions(user_id = '2fb3c95f-0250-4c9c-8194-0e22bdf1ae32') {
+    async fetchUserTransactions(user_id) {
       this.loading = true;
       try {
         const response = await transactionAPI.fetchTransactions(user_id);
