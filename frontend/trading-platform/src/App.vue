@@ -1,11 +1,13 @@
 <!-- src/App.vue -->
 <template>
   <div id="app">
-    <nav class="navbar">
+    <nav v-if="$route.name !== 'Login'" class="navbar">
       <div class="nav-container">
         <router-link to="/transacts" class="nav-link">Transactions</router-link>
         <router-link to="/assets" class="nav-link">User Assets</router-link>
         <router-link to="/all-assets" class="nav-link">All Assets</router-link>
+        <button class="logout-btn" @click="handleLogout">Logout</button>
+
       </div>
     </nav>
     <main class="content">
@@ -14,9 +16,33 @@
   </div>
 </template>
 
+
 <script>
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from './store/authStore';
+
 export default {
   name: 'App',
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const authStore = useAuthStore();
+
+    // Only show the navbar if the current route is not the Login page.
+    const showNavbar = computed(() => route.name !== 'Login');
+
+    // Logout handler that calls the store logout function and then redirects to the login page.
+    const handleLogout = () => {
+      authStore.logout(); // This should clear any tokens or user data
+      router.push({ name: 'Login' });
+    };
+
+    return {
+      showNavbar,
+      handleLogout,
+    };
+  },
 };
 </script>
 
@@ -91,4 +117,19 @@ export default {
     padding: 72px 16px 16px;
   }
 }
+
+
+.logout-btn {
+  background-color: #BB86FC;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.logout-btn:hover {
+  background-color: #fff;
+}
 </style>
+
