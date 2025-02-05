@@ -204,6 +204,9 @@ Root Mean Squared Error (RMSE): 641.7567198713232
 
 ```
 
+![Screenshot 2025-02-06 002945](https://github.com/user-attachments/assets/dadcc5c4-5c28-47a0-a268-b95f53e91f8b)
+
+
 Feel free to adjust the `setTicker` list in `Crypto.py` to test with other crypto assets.
 
 ---
