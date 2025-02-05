@@ -189,7 +189,6 @@ class TransactionService:
                 raise ValueError("No data retrieved for the asset.")
             current_buying_price = float(data['Close'].iloc[-1])  # Convert to native Python float
         except Exception as e:
-            print(str(e))
             raise HTTPException(status_code=400, detail=f"Failed to retrieve current price: {str(e)}")
 
         # Validate use_asset exists (e.g., USD)
@@ -249,7 +248,6 @@ class TransactionService:
             self.db.refresh(transaction)
             return transaction
         except Exception as e:
-            print(str(e))
             self.db.rollback()
             raise HTTPException(status_code=400, detail=f"Transaction failed: {str(e)}")
 

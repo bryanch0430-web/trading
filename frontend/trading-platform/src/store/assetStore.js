@@ -21,15 +21,9 @@ export const useAssetStore = defineStore('asset', {
         this.error = null;
         try {
           const data = await assetAPI.ListAsset();
-          console.log(data);
-          
-          // **Transform Data Here**
-  
-          // If `data` is an object with numeric keys
           if (typeof data === 'object' && !Array.isArray(data)) {
             this.assets = Object.values(data);
           } else if (Array.isArray(data)) {
-            // If it's a sparse array, filter out `undefined` items
             this.assets = data.filter(asset => asset != null);
           } else {
             this.assets = data; // Fallback
@@ -46,9 +40,6 @@ export const useAssetStore = defineStore('asset', {
         try {
           const data = await assetAPI.ListAssetPrice(assetId);
           this.currentAsset = data;
-          
-          console.log(`Fetched price for asset ID ${assetId}:`, this.currentAsset);
-
         } catch (error) {
           console.error('Error in fetchAssetPrice:', error);
           this.error = 'Failed to fetch asset price.';
@@ -60,9 +51,7 @@ export const useAssetStore = defineStore('asset', {
         this.loading = true;
         this.error = null;
         try {
-          const data = await assetAPI.getUserAssets(userId);
-          console.log(`Fetched assets for user ${userId}:`, data);
-  
+          const data = await assetAPI.getUserAssets(userId);  
           if (Array.isArray(data)) {
             this.assets = data;
           } else if (typeof data === 'object') {
@@ -83,7 +72,6 @@ export const useAssetStore = defineStore('asset', {
         this.error = null;
         try {
           const data = await assetAPI.calculateUserAsset(userId);
-          console.log('API Response:', data);
           this.assetDistribution = data;
         } catch (error) {
           console.error('Error in calculateUserAsset:', error);
@@ -100,7 +88,6 @@ export const useAssetStore = defineStore('asset', {
               "label":label
             }
           const data = await assetAPI.createAsset(payload);
-          console.log("Asset created successfully:", data);
         } catch (error) {
           console.error("Error creating asset:", error);
           this.error = "Failed to create asset.";

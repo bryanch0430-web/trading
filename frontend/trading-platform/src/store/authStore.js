@@ -16,13 +16,9 @@ export const useAuthStore = defineStore('auth', {
 
         }
         const response = await authApi.getLoginToken(payload);
-
         this.token = response.access_token;
         localStorage.setItem('access_token', this.token);
-
-        // // Fetch user profile after login
         await this.fetchUser();
-
         return true;
       } catch (error) {
         console.error('Login failed:', error);
@@ -40,9 +36,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         // const token = localStorage.getItem('access_token');
-
         const userResponse = await authApi.getUserProfile();
-        console.log('User profile:', userResponse);
         this.user = userResponse;
         localStorage.setItem('userName', this.user.username);
         localStorage.setItem('userId', this.user.id);
@@ -60,9 +54,7 @@ export const useAuthStore = defineStore('auth', {
           password: password,
         };
         const response = await authApi.registerUser(payload);
-
-        console.log("User registered successfully:", response);
-        return response; // Return the response for success feedback
+        return response; 
       } catch (error) {
         console.error("Registration failed:", error);
         throw error;

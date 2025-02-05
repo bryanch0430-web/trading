@@ -68,8 +68,6 @@ const assetId = route.params.id;
 
 // Lifecycle hook to fetch asset details on mount
 onMounted(async () => {
-  console.log('route.params:', route.params);
-  console.log('Fetching asset with ID:', assetId);
   if (assetId) {
     try {
       await assetStore.getAssetPrice(assetId);
@@ -89,17 +87,14 @@ const buyAsset = async () => {
     amount: amount.value,
     user_id: currentUserId
   };
-  console.log(payload)
   try {
     const transaction = await transactionStore.makeBuy(payload);
     
     // Check if there was an error inside the store (if not thrown)
     if (transactionStore.error) {
-      console.error('Buy transaction failed:', transactionStore.error);
       message.value = "Buy transaction failed!";
       messageType.value = "error";
     } else {
-      console.log('Buy transaction successful:', transaction);
       message.value = "Buy transaction successful!";
       messageType.value = "success";
       
@@ -126,11 +121,9 @@ const sellAsset = async () => {
     const transaction = await transactionStore.makeSell(payload);
     
     if (transactionStore.error) {
-      console.error('Sell transaction failed:', transactionStore.error);
       message.value = "Sell transaction failed!";
       messageType.value = "error";
     } else {
-      console.log('Sell transaction successful:', transaction);
       message.value = "Sell transaction successful!";
       messageType.value = "success";
       

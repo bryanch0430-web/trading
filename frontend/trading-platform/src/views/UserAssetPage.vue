@@ -105,7 +105,6 @@ async function handleDeposit() {
    };
   try {
     const transaction = await transactionAPI.depositTransaction(payload);
-    console.log('Deposit transaction:', transaction);
     closeModal();
   } catch (error) {
     errorMsg.value = error.message || 'Deposit failed. Please try again.';
@@ -125,7 +124,6 @@ async function handleWithdraw() {
 };
   try {
     const transaction = await transactionAPI.withdrawTransaction(payload);
-    console.log('Withdraw transaction:', transaction);
     closeModal();
   } catch (error) {
     errorMsg.value = error.message || 'Withdrawal failed. Please try again.';

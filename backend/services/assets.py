@@ -61,7 +61,6 @@ class AssetService:
             stock = yf.Ticker(asset.label) 
             data = stock.history()
             info = stock.info
-            print(data)
         
         except Exception as e:
             raise ValueError(f"Could not retrieve data from yfinance for {asset.name}. Error: {e}")
