@@ -64,3 +64,20 @@ class UserValueHistoryResponse(BaseModel):
 class MonthlyValueTrendResponse(BaseModel):
     time: str  # Format: 'YYYY-MM'
     value: float
+
+
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+class UserAuth(BaseModel):
+    username: str
+    password: str
+
+
+    
