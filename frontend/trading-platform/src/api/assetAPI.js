@@ -50,14 +50,27 @@ async function calculateUserAsset(userId) {
       throw error;
     }
   }
-
+  async function createAsset(asset) {
+    try {
+      const requestUrl = `/assets/create_asset`;
+      const response = await http.post(requestUrl,asset);
+      return response;
+    } catch (error) {
+      console.error("Error creating asset:", error);
+      throw error;
+    }
+  }
 export default {
     ListAsset,
     ListAssetPrice,
     getUserAssets,
-    calculateUserAsset
+    calculateUserAsset,
+    createAsset
     
 }
+
+
+
 
 
 
