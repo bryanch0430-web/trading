@@ -1,4 +1,4 @@
-# Real-Time Asset Management & Simulated Trading Platform & Predictive Analytics
+# Real-Time Asset Management in Simulated Trading Platform & Predictive Analytics
 
 Simulated Trading Platform is a simulation trading platform that enables users to create an account, log in, manage their assets and funds, and execute simulated buy/sell transactions using USD. The platform includes both a backend service (powered by Python FastAPI and PostgreSQL) and a frontend application (using Vue.js).
 
