@@ -75,11 +75,12 @@ import transactionAPI from '../api/transactionAPI';
 
 const useStore = useUserStore();
 const assetStore = useAssetStore();
+const currentUserId = localStorage.getItem('userId');
 
 onMounted(async () => {
-  await useStore.fetchUserAssets();
-  await assetStore.calculateUserAsset();
-  await useStore.ShowUserValueTrend();
+  await useStore.fetchUserAssets(currentUserId);
+  await assetStore.calculateUserAsset(currentUserId);
+  await useStore.ShowUserValueTrend(currentUserId);
 });
 
 const assetDistribution = computed(() => assetStore.getAssetDistribution);
