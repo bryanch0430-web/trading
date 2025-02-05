@@ -147,7 +147,6 @@ const closeModal = () => {
   padding: 2rem;
   border: 1px solid #cccccc;
   border-radius: 8px;
-  background-color: #f9f9f9;
 }
 
 h1 {
@@ -177,7 +176,7 @@ input[type='email'] {
 .btn {
   width: 100%;
   padding: 0.8rem;
-  background-color: #007bff;
+  background-color: #BB86FC;
   border: none;
   color: white;
   font-size: 1rem;
@@ -219,7 +218,7 @@ input[type='email'] {
 .register-btn {
   background: none;
   border: none;
-  color: #007bff;
+  color: #BB86FC;
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
@@ -233,7 +232,7 @@ input[type='email'] {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+   background-color: rgba(0, 0, 0, 0.5); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -241,7 +240,7 @@ input[type='email'] {
 }
 
 .modal {
-  background-color: #f9f9f9;
+   background-color: #f9f9f9; 
   padding: 24px;
   border-radius: 8px;
   width: 90%;
