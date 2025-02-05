@@ -33,6 +33,7 @@ Simulated Trading Platform is a simulation trading platform that enables users t
 - Python 3.12.2
 - Node.js and npm
 - PostgreSQL (Ensure you have it installed and a database created)
+- Internet connection (for real time data in yfinance)
 
 ### Virtual Environment and Dependency Installation
 
