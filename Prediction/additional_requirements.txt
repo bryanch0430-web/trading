@@ -1,7 +1,5 @@
-
-
 numpy      
 matplotlib
 ta        
 scikit-learn
-tensorflow
+torch
