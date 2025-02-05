@@ -155,7 +155,7 @@ trading
 
 ---
 
-**Additional Predictive Analytics (Experimental):**
+## Additional Predictive Analytics (Experimental)
 
 An experimental crypto price prediction function is available in the repository. Although it's not integrated into the deployed application, you can try it out locally by following these steps:
 
