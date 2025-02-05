@@ -13,7 +13,7 @@ Simulated Trading Platform is a simulation trading platform that enables users t
   - [User Flow & Routes](#user-flow--routes)
 - [Database Configuration](#database-configuration)
 - [Project Structure](#project-structure)
-- [License](#license)
+
 
 ## Features
 
