@@ -97,18 +97,12 @@ pip install -r requirements.txt
 Before running the backend, ensure you have PostgreSQL installed and configured. Update the `SQLALCHEMY_DATABASE_URL` in `database.py` file with your PostgreSQL connection string:
 
 ```python
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
 # Example: postgresql://user:password@postgresserver/dbname
 SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/dbname"
 # noramlly Postgresql 16/17 =localhost:5432/localhost:5433
-
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
 ```
 
-Make sure to create your PostgreSQL database (e.g., "new" or "trading") as referenced in the URL.
+Make sure to create your PostgreSQL database(dbname) as referenced in the URL.
 
 ## Project Structure
 
