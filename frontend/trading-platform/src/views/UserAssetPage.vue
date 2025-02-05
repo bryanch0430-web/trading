@@ -1,18 +1,14 @@
 <template>
-  <!-- Show loading spinner while data is being fetched -->
   <div v-if="loading" class="loading-spinner">
     <p>Loading assets...</p>
-    <!-- Add a spinner or animation here -->
   </div>
 
   <div v-else class="container">
     <h1>User Assets</h1>
     
-    <!-- Only render asset distribution components if assetDistribution exists -->
     <div v-if="assetDistribution && userValueTrend">
       <TotalValue :totalValue="assetDistribution.total_value" />
       
-      <!-- Responsive layout for ValueTrend and TypeDistribution -->
       <div class="charts-container">
         <ValueTrend :trendData="userValueTrend" />
         <TypeDistribution :distributionData="assetDistribution.asset_type_values" />
@@ -22,7 +18,6 @@
       <p>No asset distribution data available</p>
     </div>
 
-    <!-- Show assets once data is loaded -->
     <h3 class="asset-card-title">Asset Details</h3>
 
     <div class="assets-list">
@@ -34,7 +29,6 @@
       <button @click="showModal = true" class="manage-funds-button">Manage Funds</button>
     </div>
 
-    <!-- Modal pop out window for deposit and withdraw actions -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
         <h2>Manage Funds</h2>
@@ -50,13 +44,12 @@
           />
         </div>
 
-        <!-- Use the same structure and classes as the sell and buy buttons -->
         <div class="button-group">
           <button class="sell-button" @click="handleWithdraw" :disabled="!isValidAmount">Withdraw</button>
           <button class="buy-button" @click="handleDeposit" :disabled="!isValidAmount" >Deposit</button>
         </div>
 
-        <!-- Optionally display an error message -->
+        <!--  display error message -->
         <p v-if="errorMsg" class="alert">{{ errorMsg }}</p>
       </div>
     </div>
@@ -88,14 +81,11 @@ const assets = computed(() => useStore.userAsset);
 const userValueTrend = computed(() => useStore.getValueTrend);
 const loading = computed(() => useStore.loading);
 const isValidAmount = computed(() => amount.value > 0);
-
-// Modal and input states
 const showModal = ref(false);
 const amount = ref(0);
 const errorMsg = ref(null);
 const processing = ref(false);
 
-// Function to close modal and reset states
 const closeModal = () => {
   showModal.value = false;
   amount.value = 0;
@@ -110,8 +100,7 @@ async function handleDeposit() {
   const payload = { 
     amount: amount.value,
     deposit_pricing: 1.0,
-    user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
-
+    user_id: currentUserId
 
    };
   try {
@@ -132,7 +121,7 @@ async function handleWithdraw() {
   
   const payload = {
      amount: amount.value,
-         user_id: "2fb3c95f-0250-4c9c-8194-0e22bdf1ae32"
+     user_id: currentUserId
 };
   try {
     const transaction = await transactionAPI.withdrawTransaction(payload);
@@ -156,7 +145,6 @@ h1 {
   margin-bottom: 24px;
 }
 
-/* Flex layout for charts */
 .charts-container {
   display: flex;
   flex-wrap: wrap;
@@ -180,7 +168,6 @@ h1 {
   gap: 16px;
 }
 
-/* Modal styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -219,13 +206,11 @@ h1 {
   border-radius: 4px;
 }
 
-/* Button Group Styles */
 .button-group {
   display: flex;
   gap: 16px;
 }
 
-/* Use the same button styling as seen in the trading section */
 .buy-button,
 .sell-button {
   flex: 1;
@@ -237,14 +222,12 @@ h1 {
   font-size: 16px;
 }
 
-/* Deposit (Buy) button style */
 .buy-button {
-  background-color: #28a745; /* Green */
+  background-color: #28a745; 
 }
 
-/* Withdraw (Sell) button style */
 .sell-button {
-  background-color: #dc3545; /* Red */
+  background-color: #dc3545;
 }
 
 .buy-button:disabled,
@@ -253,13 +236,11 @@ h1 {
   cursor: not-allowed;
 }
 
-/* Additional style for the funds control button container */
 .funds-control {
   margin: 24px 0;
   text-align: center;
 }
 
-/* Optional style override for the manage funds button */
 .manage-funds-button {
   padding: 10px 20px;
   border: none;
@@ -275,10 +256,11 @@ h1 {
   margin-bottom: 0.5rem;
   color: #BB86FC;
 }
-/* Responsive adjustments for smaller screens */
+
 @media (max-width: 768px) {
   .charts-container > * {
     flex: 1 1 100%;
   }
 }
 </style>
+
