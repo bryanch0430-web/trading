@@ -1,6 +1,6 @@
-# TradeSim Platform
+# Simulation Trading Platform
 
-TradeSim Platform is a simulation trading platform that enables users to create an account, log in, manage their assets and funds, and execute simulated buy/sell transactions using USD. The platform includes both a backend service (powered by Python and PostgreSQL) and a frontend application (using a modern JavaScript framework).
+Simulation Trading Platform is a simulation trading platform that enables users to create an account, log in, manage their assets and funds, and execute simulated buy/sell transactions using USD. The platform includes both a backend service (powered by Python FastAPI and PostgreSQL) and a frontend application (using Vue.js).
 
 ## Table of Contents
 
@@ -30,7 +30,7 @@ TradeSim Platform is a simulation trading platform that enables users to create 
 
 ### Prerequisites
 
-- Python 3.x
+- Python 3.12.2
 - Node.js and npm
 - PostgreSQL (Ensure you have it installed and a database created)
 
@@ -94,7 +94,7 @@ pip install -r requirements.txt
 
 ## Database Configuration
 
-Before running the backend, ensure you have PostgreSQL installed and configured. Update the `SQLALCHEMY_DATABASE_URL` in your configuration file (located, for example, in a `database.py` file) with your PostgreSQL connection string:
+Before running the backend, ensure you have PostgreSQL installed and configured. Update the `SQLALCHEMY_DATABASE_URL` in `database.py` file with your PostgreSQL connection string:
 
 ```python
 from sqlalchemy import create_engine
@@ -102,22 +102,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Example: postgresql://user:password@postgresserver/dbname
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:P%40ssword3714!@localhost:5432/new"
-
-# Alternative example:
-# SQLALCHEMY_DATABASE_URL = "postgresql://postgres:B%40123456@localhost:5433/trading"
+SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/dbname"
+# noramlly Postgresql 16/17 =localhost:5432/localhost:5433
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 ```
 
 Make sure to create your PostgreSQL database (e.g., "new" or "trading") as referenced in the URL.
