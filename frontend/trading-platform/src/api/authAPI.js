@@ -10,8 +10,13 @@ const getUserProfile = async () => {
     return userResponse;
 };
 
-
+const registerUser = async (payload) => {
+    const response = await http.post('/users/register', payload);
+    return response;
+  };
+  
 export default {
     getLoginToken,
     getUserProfile,
+    registerUser
 };
