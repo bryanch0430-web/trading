@@ -142,6 +142,3 @@ trading
 - **Backend:** Contains Python modules for routing, data schemas, services, and utility functions for the trading simulation.
 - **Frontend:** Houses the trading platform’s client-side code with components, routing, state management, and views for user interaction.
 
-## License
-
-This project is for educational and simulation purposes. Please refer to the LICENSE file for more details.
