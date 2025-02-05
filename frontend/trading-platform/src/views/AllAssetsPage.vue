@@ -24,13 +24,14 @@ import { useAssetStore } from '../store/assetStore'; // Adjust the path based on
 //        @click="goToAsset(asset.id)"
 const assetStore = useAssetStore();
 const router = useRouter();
+const currentUserId = localStorage.getItem('userId');
 
 // Access the reactive state directly
 const assets =computed(()=> assetStore.allAssets);
 
 // Fetch assets when the component is mounted
 onMounted(async () => {
-  await assetStore.fetchAllAssets();
+  await assetStore.fetchAllAssets(currentUserId);
 });
 
   const goToAsset = (id) => {
@@ -77,3 +78,4 @@ onMounted(async () => {
     margin: 4px 0;
   }
   </style>
+
