@@ -101,10 +101,10 @@ pip install -r requirements.txt
 - **View & Create Assets (`/all-assets`):**  
   Users can view all available assets on the platform. Additionally, there's an option to create a new asset by entering a label from Yahoo Finance.
 ![Screenshot 2025-02-05 201431](https://github.com/user-attachments/assets/eb03e745-88a3-450b-8420-ecef1bd59f5c)
+![Screenshot 2025-02-05 201511](https://github.com/user-attachments/assets/24075609-ff29-4386-97c1-1c7943eece4f)
 
 - **Asset Transaction:**  
   Users can click on an asset to view its details, where they can specify an amount to buy or sell the asset using USD.  
-![Screenshot 2025-02-05 201511](https://github.com/user-attachments/assets/24075609-ff29-4386-97c1-1c7943eece4f)
 
 - **Transaction History (`/transacts`):**  
   Post any transaction, users can check the transaction history and details on the `/transacts` route.
