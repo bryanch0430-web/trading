@@ -9,3 +9,4 @@ pydantic[email]
 psycopg2
 pandas
 yfinance
+PyJWT
