@@ -80,18 +80,24 @@ pip install -r requirements.txt
 
 - **Login & User Creation (`/`):**  
   The root page serves as the login page. Here, new users can register and existing users can log in.
+![image](https://github.com/user-attachments/assets/769a6253-daf3-4adb-ab58-1d97a52a313f)
 
 - **User Asset Details (`/assets`):**  
   After logging in, users can view their asset details. This page also provides functionality to manage funds via deposit and withdrawal options (in USD).
+![Screenshot 2025-02-05 201347](https://github.com/user-attachments/assets/0b591b90-84bc-43ee-a702-4c9d5548ee29)
+![Screenshot 2025-02-05 201409](https://github.com/user-attachments/assets/5aa99a0d-fea4-44b1-b5e9-e5a1feb6e895)
 
 - **View & Create Assets (`/all-assets`):**  
   Users can view all available assets on the platform. Additionally, there's an option to create a new asset by entering a label from Yahoo Finance.
+![Screenshot 2025-02-05 201431](https://github.com/user-attachments/assets/eb03e745-88a3-450b-8420-ecef1bd59f5c)
 
 - **Asset Transaction:**  
   Users can click on an asset to view its details, where they can specify an amount to buy or sell the asset using USD.  
- 
+![Screenshot 2025-02-05 201511](https://github.com/user-attachments/assets/24075609-ff29-4386-97c1-1c7943eece4f)
+
 - **Transaction History (`/transacts`):**  
   Post any transaction, users can check the transaction history and details on the `/transacts` route.
+ ![Screenshot 2025-02-05 201227](https://github.com/user-attachments/assets/2a8807bb-acd5-4f67-9a3b-bba5ecac1a8b)
 
 ## Database Configuration
 
