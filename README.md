@@ -162,14 +162,17 @@ trading
 An experimental crypto price prediction function is available in the repository. Although it's not integrated into the deployed application, you can try it out locally by following these steps:
 
 1. Navigate to the `Prediction` folder.
-2. Install the additional dependencies by running:
+   ```bash
+   cd trading/Prediction
+   ```
+3. Install the additional dependencies by running:
     
     ```bash
     pip install -r additional_requirements.txt
     
     ```
     
-3. Run the prediction script:
+4. Run the prediction script:
     
     ```bash
     python Crypto.py
