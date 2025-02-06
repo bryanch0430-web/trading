@@ -184,12 +184,10 @@ h1 {
   align-items: center;
   z-index: 1000;
 }
-
 .modal {
-  /* background-color: var(--color-background); */
+  background-color: var(--color-panel);
   padding: 24px;
-  /* border: 1px solid #ccc; */
-  /* border-radius: var(--border-radius); */
+  border-radius: var(--border-radius);
   width: 90%;
   max-width: 400px;
 }
@@ -268,4 +266,6 @@ h1 {
   }
 }
 </style>
+
+
 
