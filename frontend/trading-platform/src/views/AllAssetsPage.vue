@@ -134,6 +134,7 @@ h1 {
   gap: 16px;
 }
 
+
 .asset-item {
   background-color: var(--color-panel);
   border-radius: 12px;
@@ -143,7 +144,7 @@ h1 {
 }
 
 .asset-item:hover {
-  background-color: #f0f0f0; /* Light gray on hover */
+  background-color: #00bfa5; 
   transform: scale(1.02);
 }
 
@@ -240,4 +241,5 @@ h1 {
   margin-bottom: 1rem;
 }
 </style>
+
 
