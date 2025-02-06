@@ -152,7 +152,7 @@ trading
             └── views
 ```
 
-- **Backend:** Contains Python modules for routing, data schemas, services, and utility functions for the trading simulation.
+- **Backend:** Contains Python modules for routing, data schemas, services, and utility functions for the trading simulation and asset management.
 - **Frontend:** Houses the trading platform’s client-side code with components, routing, state management, and views for user interaction.
 
 ---
