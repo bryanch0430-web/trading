@@ -105,6 +105,9 @@ async function handleDeposit() {
    };
   try {
     const transaction = await transactionAPI.depositTransaction(payload);
+    await useStore.fetchUserAssets(currentUserId);
+  await assetStore.calculateUserAsset(currentUserId);
+  await useStore.ShowUserValueTrend(currentUserId);
     closeModal();
   } catch (error) {
     errorMsg.value = error.message || 'Deposit failed. Please try again.';
@@ -124,6 +127,9 @@ async function handleWithdraw() {
 };
   try {
     const transaction = await transactionAPI.withdrawTransaction(payload);
+    await useStore.fetchUserAssets(currentUserId);
+  await assetStore.calculateUserAsset(currentUserId);
+  await useStore.ShowUserValueTrend(currentUserId);
     closeModal();
   } catch (error) {
     errorMsg.value = error.message || 'Withdrawal failed. Please try again.';
