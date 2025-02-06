@@ -182,27 +182,3 @@ button:focus {
   }
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-background: #ffffff;
-    --color-text: #212121;
-    --color-panel: #f5f5f5;
-    --color-primary: #6200EE; /* Adjusted for light mode */
-    --color-secondary: #018786;
-    --color-muted: #757575;
-    --color-danger: #B00020;
-  }
-  a {
-    color: #6200EE;
-  }
-  a:hover {
-    color: #3700B3;
-  }
-  button {
-    background-color: var(--color-primary);
-    color: var(--color-text);
-  }
-  .card {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-}
