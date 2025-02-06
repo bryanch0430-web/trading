@@ -142,10 +142,10 @@ const closeModal = () => {
 <style scoped>
 /* Login container styles */
 .login-container {
+  background-color: var(--color-panel);
   max-width: 400px;
   margin: 80px auto;
   padding: 2rem;
-  border: 1px solid #cccccc;
   border-radius: 8px;
 }
 
@@ -240,8 +240,9 @@ input[type='email'] {
 }
 
 .modal {
-  background-color: var(--color-background);
+  background-color: var(--color-panel);
   padding: 24px;
+  border-radius: var(--border-radius);
   width: 90%;
   max-width: 400px;
 }
@@ -258,3 +259,4 @@ input[type='email'] {
   }
 }
 </style>
+
