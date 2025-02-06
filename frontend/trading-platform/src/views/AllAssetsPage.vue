@@ -5,9 +5,19 @@
       <button class="manage-funds-button" @click="openModal">Add Asset</button>
     </div>
 
+    <!-- Search Bar -->
+    <div class="input-group">
+      <input
+        v-model="searchQuery"
+        type="text"
+        placeholder="Search by name or label..."
+        class="search-input"
+      />
+    </div>
+    
     <div class="assets-list">
       <div
-        v-for="asset in assets"
+        v-for="asset in filteredAssets"
         :key="asset.id"
         class="asset-item"
         @click="goToAsset(asset.id)"
@@ -45,7 +55,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -55,15 +64,28 @@ const assetStore = useAssetStore();
 const router = useRouter();
 const currentUserId = localStorage.getItem('userId');
 
-// Reactive state for assets, modal visibility, asset label and error message
+// Reactive state for assets, modal visibility, asset label, error message, and search query
 const assets = computed(() => assetStore.allAssets);
 const showModal = ref(false);
 const assetLabel = ref("");
 const errorMessage = ref("");
+const searchQuery = ref("");
 
 // Fetch assets on component mount
 onMounted(async () => {
   await assetStore.fetchAllAssets(currentUserId);
+});
+
+// Computed property to filter assets based on search query
+const filteredAssets = computed(() => {
+  if (!searchQuery.value) {
+    return assets.value;
+  }
+  const query = searchQuery.value.toLowerCase();
+  return assets.value.filter(asset => 
+    asset.name.toLowerCase().includes(query) || 
+    asset.label.toLowerCase().includes(query)
+  );
 });
 
 // Navigation to a single asset details page
@@ -177,6 +199,7 @@ h1 {
   max-width: 400px;
 }
 
+
 .input-group {
   display: flex;
   flex-direction: column;
@@ -241,5 +264,7 @@ h1 {
   margin-bottom: 1rem;
 }
 </style>
+
+
 
 
