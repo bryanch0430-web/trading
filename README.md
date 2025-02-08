@@ -101,8 +101,9 @@ pip install -r requirements.txt
 
 - **View & Create Assets (`/all-assets`):**  
   Users can view all available assets on the platform. Additionally, there's an option to create a new asset by entering a label from Yahoo Finance.
-![Screenshot 2025-02-05 201431](https://github.com/user-attachments/assets/eb03e745-88a3-450b-8420-ecef1bd59f5c)
-![Screenshot 2025-02-05 201511](https://github.com/user-attachments/assets/24075609-ff29-4386-97c1-1c7943eece4f)
+![image](https://github.com/user-attachments/assets/0010f8f2-5f00-499d-bfbb-79278fd2b1f5)
+![image](https://github.com/user-attachments/assets/85cd126e-7018-4f9e-bf65-61d9fbe4a189)
+
 
 - **Asset Transaction: (`/all-assets/:id`):**  
   Users can click on an asset to view its details, where they can specify an amount to buy or sell the asset using USD.  
@@ -128,6 +129,7 @@ Make sure to create your PostgreSQL database(dbname) as referenced in the URL.
 
 ```
 trading
+├── Prediction
 ├── backend
 │   ├── routers
 │   │   └── __pycache__
@@ -155,7 +157,7 @@ trading
 
 - **Backend:** Contains Python modules for routing, data schemas, services, and utility functions for the trading simulation and asset management.
 - **Frontend:** Houses the trading platform’s client-side code with components, routing, state management, and views for user interaction.
-
+- **Prediction** Contains Python modules for experimental price prediction function
 ---
 
 ## Additional Predictive Analytics (Experimental)
