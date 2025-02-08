@@ -89,8 +89,9 @@ pip install -r requirements.txt
 
 - **Login & User Creation (`/`):**  
   The root page serves as the login page. Here, new users can register and existing users can log in.
-![image](https://github.com/user-attachments/assets/769a6253-daf3-4adb-ab58-1d97a52a313f)
-![image](https://github.com/user-attachments/assets/86f5c764-58ae-4926-9465-f02c23d09f43)
+  ![image](https://github.com/user-attachments/assets/e8ff2ac5-20e7-4590-861c-ec82f5f37ae9)
+  ![image](https://github.com/user-attachments/assets/f486ed07-0b76-4d59-a0ab-befb411d5f0e)
+
 
 
 - **User Asset Details (`/assets`):**  
