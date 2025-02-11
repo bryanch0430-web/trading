@@ -50,54 +50,72 @@ def load_default_assets():
                     "name": "USD/USD",
                     "label": "USD=X",
                     "type": "other",
+                    "currency": "USD"
                 },
                 {
                     "id": "e799c40d-2321-498e-a6d0-59b413c82d91",
                     "name": "Bitcoin USD",
                     "label": "BTC-USD",
                     "type": "crypto",
+                    "currency": "USD"
+
+
                 },
                 {
                     "id": "977bc0ff-2a62-4c98-90e6-443acb0286af",
                     "name": "Ethereum USD",
                     "label": "ETH-USD",
                     "type": "crypto",
+                    "currency": "USD"
+
                 },
                 {
                     "id": "449a300b-bcc6-43a4-b0d5-9c605da36ab5",
                     "name": "Ethereum Name Service USD",
                     "label": "ENS-USD",
                     "type": "crypto",
+                    "currency": "USD"
+
                 },
                 {
                     "id": "9fe20aca-f196-4a88-9cb0-7e406eab5653",
                     "name": "JasmyCoin USD",
                     "label": "JASMY-USD",
                     "type": "crypto",
+                    "currency": "USD"
+
                 },
                 {
                     "id": "4f78f46b-97ec-4251-b73b-1bcd63e5a629",
                     "name": "Litecoin USD",
                     "label": "LTC-USD",
                     "type": "crypto",
+                    "currency": "USD"
+
                 },
                 {
                     "id": "828c4121-6a90-4acb-9001-aafdafe051fd",
                     "name": "Agilent Technologies, Inc.",
                     "label": "A",
                     "type": "stock",
+                    "currency": "USD"
+
                 },
                 {
                     "id": "3dfc0bb8-a4fc-465e-8644-5485ba1d9dff",
                     "name": "Visa Inc.",
                     "label": "V",
                     "type": "stock",
+                    "currency": "USD"
+
                 },
                 {
                     "id": "0a4f4d00-71fe-4368-acef-765b34e422d8",
                     "name": "Alphabet Inc.",
                     "label": "GOOG",
                     "type": "stock",
+                    "currency": "USD"
+
                 },
             ]
 
@@ -108,6 +126,7 @@ def load_default_assets():
                     name=asset_data["name"],
                     label=asset_data["label"],
                     asset_type=asset_data["type"],
+                    currency = asset_data["currency"]
                 )
                 for asset_data in default_assets_data
             ]
