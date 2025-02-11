@@ -3,7 +3,7 @@
   <div class="asset-card" @click="navigateToAsset">
     <h3>{{ asset.asset_name }}</h3>
     <p>Amount: {{ asset.total_value }}</p>
-    <p>Buy Price: ${{ asset.average_price }} </p>
+    <p>Buy Price: ${{ asset.average_price }} {{asset.currency}}</p>
   </div>
 </template>
 
