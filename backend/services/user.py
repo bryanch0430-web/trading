@@ -64,10 +64,12 @@ class UserService:
                     asset_name=ua.asset.name,
                     asset_type=ua.asset.asset_type,
                     total_value=ua.total_value,
-                    average_price=ua.average_price
+                    average_price=ua.average_price,
+                    currency =ua.asset.currency
             ))
 
         return result
+
 
     def get_user_transactions(self, user_id: uuid.UUID) -> List[UserTransactionResponse]:
         transactions = (
