@@ -39,6 +39,7 @@ class UserAssetResponse(BaseModel):
     asset_type: str
     total_value: float
     average_price: float
+    currency :str
 
 class UserTransactionResponse(BaseModel):
     id: uuid.UUID
