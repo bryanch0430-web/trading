@@ -164,12 +164,11 @@ class TransactionService:
         except Exception as e:
             self.db.rollback()
             raise HTTPException(status_code=400, detail="Transaction failed")
-
     def buy(self, transaction_data: BuyTransactionCreate):
         user_id = transaction_data.user_id
         buy_target_asset_id = transaction_data.buy_target_asset_id
         amount = transaction_data.amount
-        label = 'USD=X'
+        usd_asset_label = 'USD=X'
 
         # Validate user exists
         user = self.db.query(User).filter(User.id == user_id).first()
@@ -181,65 +180,71 @@ class TransactionService:
         if not target_asset:
             raise HTTPException(status_code=404, detail="Target asset not found")
 
-        # Fetch current buying price using yfinance
+        if target_asset.currency == 'USD':
+            conversion_rate = 1.0
+        else:
+            try:
+                currency_ticker = yf.Ticker(f"{target_asset.currency}=X")
+                currency_history = currency_ticker.history(period="1d")
+                if currency_history.empty:
+                    raise ValueError(f"No currency conversion data found for {target_asset.currency}.")
+                conversion_rate = float(currency_history['Close'].iloc[-1])
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Failed to retrieve conversion rate for {target_asset.currency}: {str(e)}")
+
         try:
             stock = yf.Ticker(target_asset.label)
             data = stock.history(period="1d")
             if data.empty:
                 raise ValueError("No data retrieved for the asset.")
-            current_buying_price = float(data['Close'].iloc[-1])  # Convert to native Python float
+            native_price = float(data['Close'].iloc[-1])
+            current_buying_price = native_price / conversion_rate  
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Failed to retrieve current price: {str(e)}")
 
-        # Validate use_asset exists (e.g., USD)
-        use_asset = self.db.query(Asset).filter(Asset.label == label).first()
+        use_asset = self.db.query(Asset).filter(Asset.label == usd_asset_label).first()
         if not use_asset:
-            raise HTTPException(status_code=404, detail="Use asset not found")
+            raise HTTPException(status_code=404, detail="Use asset (USD) not found")
 
-        # Check that the user has sufficient funds
-        total_cost = float(amount * current_buying_price)  # Convert to native Python float
+        total_cost = float(amount * current_buying_price)
         user_use_asset = self.db.query(UserAsset).filter(
             UserAsset.user_id == user_id, UserAsset.asset_id == use_asset.id
         ).first()
         if not user_use_asset or user_use_asset.total_value < total_cost:
             raise HTTPException(status_code=400, detail="Insufficient funds to perform this transaction")
 
-        # Deduct the total cost from user's use_asset
-        user_use_asset.total_value = float(user_use_asset.total_value - total_cost)  # Convert to native Python float
+        user_use_asset.total_value = float(user_use_asset.total_value - total_cost)
 
-        # Update or create user's target asset holdings
         user_target_asset = self.db.query(UserAsset).filter(
             UserAsset.user_id == user_id, UserAsset.asset_id == buy_target_asset_id
         ).first()
+
         if user_target_asset:
             previous_total_value = float(user_target_asset.total_value)
             previous_avg_price = float(user_target_asset.average_price)
 
             new_total_value = float(previous_total_value + amount)
-            new_average_price = float(
-                (previous_avg_price * previous_total_value) + (current_buying_price * amount)
-            ) / new_total_value
-
+            new_average_price = float((previous_avg_price * previous_total_value) + (native_price * amount)) / new_total_value
             user_target_asset.total_value = new_total_value
             user_target_asset.average_price = new_average_price
         else:
-            # Create new UserAsset record
+            # Create a new UserAsset record.
             user_target_asset = UserAsset(
                 user_id=user_id,
                 asset_id=buy_target_asset_id,
                 total_value=float(amount),
-                average_price=float(current_buying_price),
+                average_price=float(native_price)  # stored in the native currency
             )
             self.db.add(user_target_asset)
 
-        # Create a Transaction record
+        # Create a Transaction record. The transaction price is recorded in USD.
         transaction = Transaction(
             user_id=user_id,
             asset_id=buy_target_asset_id,
             transaction_type="buy",
             amount=float(amount),
             timestamp=datetime.utcnow(),
-            price=float(current_buying_price)  # Ensure price is a native Python float
+            price=float(current_buying_price)
         )
         self.db.add(transaction)
 
@@ -257,24 +262,34 @@ class TransactionService:
         sell_target_asset_id = transaction_data.sell_target_asset_id
         amount = transaction_data.amount
         label = 'USD=X'
+        
 
-        # Validate user exists
         user = self.db.query(User).filter(User.id == user_id).first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        # Validate target asset exists
         target_asset = self.db.query(Asset).filter(Asset.id == sell_target_asset_id).first()
         if not target_asset:
             raise HTTPException(status_code=404, detail="Target asset not found")
-
-        # Fetch current selling price using yfinance
+        if target_asset.currency == 'USD':
+            conversion_rate = 1.0
+        else:
+            try:
+                currency_ticker = yf.Ticker(f"{target_asset.currency}=X")
+                currency_history = currency_ticker.history(period="1d")
+                if currency_history.empty:
+                    raise ValueError(f"No currency conversion data found for {target_asset.currency}.")
+                conversion_rate = float(currency_history['Close'].iloc[-1])
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=f"Failed to retrieve conversion rate for {target_asset.currency}: {str(e)}")
         try:
             stock = yf.Ticker(target_asset.label)
             data = stock.history(period="1d")
             if data.empty:
                 raise ValueError("No data retrieved for the asset.")
-            current_selling_price = float(data['Close'].iloc[-1])  # Convert to native Python float
+            native_price =  float(data['Close'].iloc[-1]) 
+            current_selling_price = float(data['Close'].iloc[-1]/conversion_rate) 
+             # Convert to native Python float
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Failed to retrieve current price: {str(e)}")
 
@@ -290,22 +305,17 @@ class TransactionService:
         if not user_target_asset or user_target_asset.total_value < amount:
             raise HTTPException(status_code=400, detail="Insufficient asset to sell")
 
-        # Calculate new total value and average price for the target asset
         previous_total_value = float(user_target_asset.total_value)
         previous_average_price = float(user_target_asset.average_price)
         total_value_after = float(previous_total_value - amount)
 
-        # Calculate proceeds from the sale
-        proceeds = float(amount * current_selling_price)  # Convert to native Python float
-
-        # Update user's target asset holdings
+        proceeds = float(amount * native_price) 
         user_target_asset.total_value = total_value_after
         if total_value_after > 0:
             user_target_asset.average_price = (float(previous_total_value * previous_average_price)-proceeds)/ (total_value_after)
         else:
             user_target_asset.average_price = 0.0
 
-        # Update or create user's get_back_asset holdings (e.g., USD)
         user_get_back_asset = self.db.query(UserAsset).filter(
             UserAsset.user_id == user_id, UserAsset.asset_id == get_back_asset.id
         ).first()
@@ -341,6 +351,10 @@ class TransactionService:
             self.db.rollback()
             raise HTTPException(status_code=400, detail=f"Transaction failed: {str(e)}")
         
+
+
+        
+
 
 
         
