@@ -24,7 +24,7 @@ class Asset(Base):
     name = Column(String, index=True, nullable=False)
     label = Column(String, index=True, nullable=False)
     asset_type = Column(String, nullable=False)  # e.g., "crypto", "stock", ...
-
+    currency = Column(String, nullable=False) 
     user_assets = relationship("UserAsset", back_populates="asset")
     transactions = relationship("Transaction", back_populates="asset")
 
