@@ -44,7 +44,8 @@ class AssetService:
         db_asset = Asset(
             name=name,
             asset_type=asset_type,
-            label =asset.label
+            currency=info.get("currency"),
+            label = asset.label
         )
         self.db.add(db_asset)
         self.db.commit()
@@ -64,7 +65,7 @@ class AssetService:
         
         except Exception as e:
             raise ValueError(f"Could not retrieve data from yfinance for {asset.name}. Error: {e}")
-        
+        print(info)
         asset_details = AssetDetails(
             asset_id=asset_id,
             name=asset.label,
@@ -113,7 +114,6 @@ class AssetService:
          return self.db.query(Asset).all()
         
     def calculate_asset_type_distribution(db: Session, user_id: uuid.UUID) -> Optional[UserAssetTypeDistribution]:
-
         try:
             user_assets = db.query(UserAsset).filter(UserAsset.user_id == user_id).all()
             if not user_assets:
@@ -122,6 +122,8 @@ class AssetService:
 
             asset_type_values = {}
             total_portfolio_value = 0.0
+
+            currency_conversion_cache = {"USD": 1.0}
 
             for user_asset in user_assets:
                 asset = db.query(Asset).filter(Asset.id == user_asset.asset_id).first()
@@ -136,13 +138,29 @@ class AssetService:
                         logger.warning(f"No price data found for asset {asset.label}.")
                         continue
 
-                    current_price = history['Close'].iloc[-1]
+                    # Get conversion rate if currency is not USD.
+                    if asset.currency in currency_conversion_cache:
+                        currency_price = currency_conversion_cache[asset.currency]
+                    else:
+                        if asset.currency == 'USD':
+                            currency_price = 1.0
+                        else:
+                            try:
+                                currency_ticker = yf.Ticker(f"{asset.currency}=X")
+                                currency_history = currency_ticker.history(period="1d")
+                                if currency_history.empty:
+                                    logger.warning(f"No currency conversion data found for {asset.currency}.")
+                                    continue
+                                currency_price = currency_history['Close'].iloc[-1]
+                            except Exception as e:
+                                logger.error(f"Error fetching currency conversion data for {asset.currency}: {e}")
+                                continue
+                        currency_conversion_cache[asset.currency] = currency_price
+
+                    current_price = history['Close'].iloc[-1] / currency_price
                     asset_value = user_asset.total_value * current_price
 
-                    if asset.asset_type in asset_type_values:
-                        asset_type_values[asset.asset_type] += asset_value
-                    else:
-                        asset_type_values[asset.asset_type] = asset_value
+                    asset_type_values[asset.asset_type] = asset_type_values.get(asset.asset_type, 0) + asset_value
 
                     total_portfolio_value += asset_value
 
@@ -155,8 +173,7 @@ class AssetService:
                 return None
 
             asset_type_percentages = {
-                asset_type: (value 
-                             / total_portfolio_value) * 100
+                asset_type: (value / total_portfolio_value) * 100
                 for asset_type, value in asset_type_values.items()
             }
 
@@ -235,3 +252,4 @@ class AssetService:
             logger.error(f"CSV file not found at path: {csv_path}")
         except Exception as e:
             logger.error(f"An unexpected error occurred during import: {e}")
+
