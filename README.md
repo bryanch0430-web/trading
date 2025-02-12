@@ -168,7 +168,7 @@ An experimental crypto price prediction function is available in the repository.
    ```bash
    cd trading/Prediction
    ```
-3. Install the additional dependencies by running:
+3. Install the additional dependencies by running (please also install the requirements.txt):
     
     ```bash
     pip install -r additional_requirements.txt
