@@ -1,4 +1,4 @@
-fastapi==0.115.8
+fastapi
 pydantic[email]==2.10.6
 pydantic==2.10.6
 SQLAlchemy==2.0.37
@@ -8,5 +8,5 @@ pytz==2025.1
 uvicorn==0.34.0
 psycopg2==2.9.10
 pandas==2.2.3
-yfinance==0.2.52
+yfinance
 PyJWT==2.10.1
